@@ -1,0 +1,161 @@
+{
+  "domain": "Python",
+  "level": "Intermediate",
+  "topics": [
+    {
+      "title": "Functions, Parameters, and Scope",
+      "notes": [
+        "def defines a reusable function; its indented body runs when the function is called.",
+        "Parameters receive arguments. Positional and keyword arguments can be combined when their order is valid.",
+        "return sends a value back to the caller; a function without an explicit return produces None.",
+        "Names assigned inside a function are local by default, helping functions avoid changing unrelated variables."
+      ],
+      "example": "def apply_tax(price, rate=0.1):\n    total = price * (1 + rate)\n    return round(total, 2)\n\nbill = apply_tax(50, rate=0.2)\nprint(bill)",
+      "example_output": "60.0",
+      "mcqs": [
+        {
+          "question": "What value does apply_tax(50, rate=0.2) return?",
+          "options": ["50", "55.0", "60.0", "10.0"],
+          "correct_answer": "C",
+          "explanation": "The function multiplies 50 by 1 + 0.2, giving 60.0, then rounds it to two decimal places."
+        },
+        {
+          "question": "What does a Python function return if execution reaches the end without a return statement?",
+          "options": ["0", "False", "None", "An empty string"],
+          "correct_answer": "C",
+          "explanation": "Python implicitly returns None when a function finishes without executing a return with a value."
+        },
+        {
+          "question": "Inside a function, what is the usual scope of a name assigned in the function body?",
+          "options": ["Local to that function call", "Automatically global", "Visible only in the next function defined", "Stored as a module constant"],
+          "correct_answer": "A",
+          "explanation": "Assignment inside a function makes a name local to that function unless it is explicitly declared global or nonlocal."
+        }
+      ]
+    },
+    {
+      "title": "Collections and Mutability",
+      "notes": [
+        "Lists are ordered and mutable; tuples are ordered and immutable after construction.",
+        "Dictionaries map unique hashable keys to values, while sets hold unique hashable items.",
+        "Assignment does not copy a mutable object: two names can refer to the same list or dictionary.",
+        "Use list.copy() or another deliberate copy operation when you need an independent shallow copy."
+      ],
+      "example": "colors = [\"blue\", \"green\"]\nbackup = colors.copy()\ncolors.append(\"gold\")\nprofile = {\"name\": \"Kai\", \"active\": True}\nunique_ids = {3, 3, 7}\nprint(backup)\nprint(profile[\"name\"], profile[\"active\"])\nprint(sorted(unique_ids))",
+      "example_output": "['blue', 'green']\nKai True\n[3, 7]",
+      "mcqs": [
+        {
+          "question": "After backup = colors.copy(), what happens to backup when \"gold\" is appended to colors?",
+          "options": ["backup also gains \"gold\" automatically.", "backup remains unchanged because copy created a separate shallow list.", "Both lists become empty.", "The append raises an error."],
+          "correct_answer": "B",
+          "explanation": "copy() creates a new list object, so appending to colors does not add an item to backup."
+        },
+        {
+          "question": "How many items are in the set {3, 3, 7}?",
+          "options": ["0", "2", "3", "It depends on insertion order."],
+          "correct_answer": "B",
+          "explanation": "A set keeps each distinct value once, so the duplicate 3 is removed and the set contains 3 and 7."
+        },
+        {
+          "question": "Which collection is designed to associate a key such as \"name\" with a value?",
+          "options": ["A dictionary", "A set", "A range", "A Boolean"],
+          "correct_answer": "A",
+          "explanation": "A dictionary stores key-value pairs, making it suitable for looking up a value by a meaningful key."
+        }
+      ]
+    },
+    {
+      "title": "Comprehensions and Iteration",
+      "notes": [
+        "A list comprehension builds a list from an iterable using a compact expression.",
+        "An optional if clause filters which items are included in a comprehension.",
+        "Dictionary comprehensions create key-value mappings; set comprehensions create unique values.",
+        "A generator expression uses parentheses and yields values lazily instead of building a full list immediately."
+      ],
+      "example": "squares = [n * n for n in range(6) if n % 2 == 0]\nlookup = {n: n * n for n in range(3)}\nlazy_squares = (n * n for n in range(6))\nprint(squares)\nprint(lookup)\nprint(next(lazy_squares))",
+      "example_output": "[0, 4, 16]\n{0: 0, 1: 1, 2: 4}\n0",
+      "mcqs": [
+        {
+          "question": "What is the value of [n * n for n in range(6) if n % 2 == 0]?",
+          "options": ["[0, 4, 16]", "[1, 9, 25]", "[0, 1, 4, 9, 16, 25]", "[0, 2, 4]"],
+          "correct_answer": "A",
+          "explanation": "The filter keeps 0, 2, and 4; squaring them produces 0, 4, and 16."
+        },
+        {
+          "question": "What is an important difference between a generator expression and a list comprehension?",
+          "options": ["A generator expression is evaluated lazily as values are requested.", "A generator expression always stores more values in memory.", "A list comprehension cannot include a filter.", "A generator expression can contain only strings."],
+          "correct_answer": "A",
+          "explanation": "Generator expressions produce values on demand, which can avoid allocating a complete result list."
+        },
+        {
+          "question": "Which expression creates a dictionary mapping each number to its square for 0, 1, and 2?",
+          "options": ["{n: n * n for n in range(3)}", "[n: n * n for n in range(3)]", "(n, n * n for n in range(3))", "{n * n for n in range(3)}"],
+          "correct_answer": "A",
+          "explanation": "A dictionary comprehension uses braces and a key:value expression before the for clause."
+        }
+      ]
+    },
+    {
+      "title": "Exceptions and Safe Cleanup",
+      "notes": [
+        "Exceptions report errors during execution; catch only errors your code can handle meaningfully.",
+        "try contains risky operations, except handles a matching exception, and else runs when no exception occurred.",
+        "finally runs whether an exception occurred or not, making it suitable for essential cleanup.",
+        "with manages a resource through a context manager so it is released even when an error occurs."
+      ],
+      "example": "from io import StringIO\n\ntry:\n    quantity = int(\"12\")\nexcept ValueError as error:\n    print(f\"Invalid quantity: {error}\")\nelse:\n    print(quantity)\n\nwith StringIO(\"first line\\nsecond line\\n\") as file:\n    first_line = file.readline().strip()\nprint(first_line)",
+      "example_output": "12\nfirst line",
+      "mcqs": [
+        {
+          "question": "Which exception should be caught when int(\"twelve\") cannot convert its input?",
+          "options": ["IndexError", "ValueError", "KeyError", "StopIteration"],
+          "correct_answer": "B",
+          "explanation": "int raises ValueError when a string does not contain a valid integer representation."
+        },
+        {
+          "question": "When does a try statement's else block run?",
+          "options": ["Only when an exception was raised.", "When the try block completes without raising an exception.", "Before the try block.", "Only after the program exits."],
+          "correct_answer": "B",
+          "explanation": "The else block is for work that should run only when the try suite completed successfully."
+        },
+        {
+          "question": "Why is with open(path) generally preferred to opening a file and remembering to close it manually?",
+          "options": ["The with statement manages closing the file when its block exits.", "It makes every file read faster.", "It permanently stores the file in memory.", "It suppresses all file errors."],
+          "correct_answer": "A",
+          "explanation": "A file context manager closes its resource when leaving the with block, including when an exception interrupts the block."
+        }
+      ]
+    },
+    {
+      "title": "Modules, Imports, and Testing",
+      "notes": [
+        "A module is a Python file whose functions and values can be reused with import.",
+        "Prefer explicit imports such as from math import sqrt over wildcard imports that obscure where names came from.",
+        "The __name__ variable is \"__main__\" when a file is run directly and the module name when it is imported.",
+        "Small unit tests check one behavior at a time and help catch regressions when code changes."
+      ],
+      "example": "from math import sqrt\n\ndef distance_from_zero(value):\n    return sqrt(value * value)\n\nif __name__ == \"__main__\":\n    print(distance_from_zero(5))",
+      "example_output": "5.0",
+      "mcqs": [
+        {
+          "question": "What is the purpose of if __name__ == \"__main__\": in a module?",
+          "options": ["Run the guarded code only when this file is executed directly.", "Rename the module to __main__ permanently.", "Prevent every function in the file from being imported.", "Run the guarded code whenever the module is imported."],
+          "correct_answer": "A",
+          "explanation": "When a Python file is run directly its __name__ is __main__; importing it sets __name__ to the module's name."
+        },
+        {
+          "question": "Why is from math import sqrt more explicit than from math import *?",
+          "options": ["It identifies the imported name and avoids filling the namespace with unknown names.", "It disables the math module.", "It imports every Python package.", "It prevents sqrt from being called."],
+          "correct_answer": "A",
+          "explanation": "An explicit import makes a dependency visible and avoids unexpected name collisions from wildcard imports."
+        },
+        {
+          "question": "What is a useful unit test expected to do?",
+          "options": ["Check a small behavior against an expected result.", "Replace all documentation.", "Run only when the program is installed.", "Change the source code while the application runs."],
+          "correct_answer": "A",
+          "explanation": "A unit test verifies a focused piece of behavior so changes that break it can be detected quickly."
+        }
+      ]
+    }
+  ]
+}

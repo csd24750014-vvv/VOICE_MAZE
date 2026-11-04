@@ -1,0 +1,163 @@
+{
+  "domain": "Python",
+  "level": "Beginner",
+  "topics": [
+    {
+      "title": "Variables and Assignment",
+      "notes": [
+        "A variable is a name that refers to a value; Python creates it when you assign a value.",
+        "Use the equals sign (=) to assign. Assignment stores a value; it does not mean mathematical equality.",
+        "Names are case-sensitive, must begin with a letter or underscore, and cannot be Python keywords.",
+        "Choose descriptive snake_case names such as student_name so code is easier to understand."
+      ],
+      "example": "student_name = \"Mira\"\nscore = 12\nscore = score + 3\nprint(student_name, score)",
+      "example_output": "Mira 15",
+      "mcqs": [
+        {
+          "question": "After score = 12 followed by score = score + 3, what value does score contain?",
+          "options": ["9", "12", "15", "123"],
+          "correct_answer": "C",
+          "explanation": "The second assignment reads the current value 12, adds 3, and stores the result 15."
+        },
+        {
+          "question": "Which name follows Python's usual style for a variable holding a student's name?",
+          "options": ["studentName", "student_name", "Student-Name", "2student"],
+          "correct_answer": "B",
+          "explanation": "Python variable names conventionally use lowercase words separated by underscores; names cannot start with a digit or contain a hyphen."
+        },
+        {
+          "question": "What does the equals sign do in total = 8?",
+          "options": ["It compares total with 8 and prints the result.", "It assigns the value 8 to the name total.", "It adds total and 8.", "It declares total as a constant."],
+          "correct_answer": "B",
+          "explanation": "A single equals sign is the assignment operator: it binds the name total to the value 8."
+        }
+      ]
+    },
+    {
+      "title": "Data Types",
+      "notes": [
+        "int represents whole numbers, float represents numbers with a fractional part, and str represents text.",
+        "bool has only two values: True and False. Capitalization matters for both values.",
+        "Use type(value) to inspect a value's type and int(), float(), or str() for explicit conversions.",
+        "Text such as \"42\" is a string until it is converted; strings and numbers cannot always be combined directly."
+      ],
+      "example": "age_text = \"12\"\nage = int(age_text)\nheight = 1.5\nis_ready = True\nprint(type(age).__name__, type(height).__name__, is_ready)",
+      "example_output": "int float True",
+      "mcqs": [
+        {
+          "question": "What is the type of the value 4.0?",
+          "options": ["int", "float", "str", "bool"],
+          "correct_answer": "B",
+          "explanation": "A number written with a decimal point is a float, even when its fractional part is zero."
+        },
+        {
+          "question": "What is the value of int(\"24\")?",
+          "options": ["The integer 24", "The string \"24\"", "The float 24.0", "An error because text cannot be converted"],
+          "correct_answer": "A",
+          "explanation": "The int constructor converts a string containing a valid whole-number representation into the integer 24."
+        },
+        {
+          "question": "Which pair contains the only two built-in Boolean values?",
+          "options": ["yes and no", "1 and 0", "True and False", "true and false"],
+          "correct_answer": "C",
+          "explanation": "Python's Boolean literals are spelled True and False, with initial capital letters."
+        }
+      ]
+    },
+    {
+      "title": "Operators and Expressions",
+      "notes": [
+        "Arithmetic operators include +, -, *, /, // for floor division, and % for the remainder.",
+        "The ** operator raises a number to a power; for example, 2 ** 3 is 8.",
+        "Comparisons such as ==, !=, <, and >= produce Boolean results.",
+        "Use parentheses to make the intended order of operations clear, especially in longer expressions."
+      ],
+      "example": "apples = 17\nboxes = apples // 5\nleft_over = apples % 5\nsame = (3 + 2) == 5\nprint(boxes, left_over, same)",
+      "example_output": "3 2 True",
+      "mcqs": [
+        {
+          "question": "What is the result of 17 // 5 in Python?",
+          "options": ["3", "3.4", "2", "4"],
+          "correct_answer": "A",
+          "explanation": "Floor division discards the fractional part of the quotient; 17 divided by 5 is 3 with a remainder."
+        },
+        {
+          "question": "What does 17 % 5 evaluate to?",
+          "options": ["3", "2", "5", "0"],
+          "correct_answer": "B",
+          "explanation": "The modulo operator returns the remainder. Five fits into seventeen three times with two left over."
+        },
+        {
+          "question": "What kind of value does 4 >= 4 produce?",
+          "options": ["The integer 4", "The string \"True\"", "The Boolean True", "The Boolean False"],
+          "correct_answer": "C",
+          "explanation": "The greater-than-or-equal comparison is true when the left value equals the right value, and comparisons return a Boolean."
+        }
+      ]
+    },
+    {
+      "title": "Conditionals and Decisions",
+      "notes": [
+        "An if statement runs its indented block when its condition is true.",
+        "Use elif for another condition and else for the remaining case; Python checks branches in order.",
+        "Conditions can combine comparisons with and, or, and not.",
+        "A colon begins each branch, and consistent indentation marks which statements belong to it."
+      ],
+      "example": "temperature = 18\nif temperature >= 25:\n    print(\"warm\")\nelif temperature >= 15:\n    print(\"mild\")\nelse:\n    print(\"cool\")",
+      "example_output": "mild",
+      "mcqs": [
+        {
+          "question": "If points is 7, which branch runs in if points >= 10: ... else: ...?",
+          "options": ["The if branch, because 7 is positive.", "The else branch, because 7 is less than 10.", "Both branches.", "Neither branch."],
+          "correct_answer": "B",
+          "explanation": "The comparison 7 >= 10 is false, so Python runs the else block."
+        },
+        {
+          "question": "When does an elif branch run?",
+          "options": ["Whenever the preceding if condition is true.", "When the preceding conditions are false and its own condition is true.", "Only when there is no else branch.", "Before Python checks the if condition."],
+          "correct_answer": "B",
+          "explanation": "Python evaluates an elif only after earlier conditions in the same chain failed, and runs its block if that condition is true."
+        },
+        {
+          "question": "What does not (3 > 5) evaluate to?",
+          "options": ["True", "False", "3", "An error"],
+          "correct_answer": "A",
+          "explanation": "The comparison 3 > 5 is false, and not reverses false to true."
+        }
+      ]
+    },
+    {
+      "title": "Loops and Repetition",
+      "notes": [
+        "A for loop is best when you know what collection or sequence to visit; it takes the next item automatically on each pass.",
+        "range(1, 4) produces 1, 2, 3. Its final number is a stop boundary, so 4 is not included.",
+        "A while loop is best when repetition depends on a condition, such as waiting until a counter reaches a target.",
+        "A while loop needs progress inside its body. Updating count changes the condition; without progress, the loop may never end.",
+        "In the example, for adds 1 + 2 + 3. Then while increases count from 0 to 2, stopping when count < 2 is false.",
+        "break exits a loop immediately; continue skips the rest of the current pass and begins the next one."
+      ],
+      "example": "total = 0\nfor number in range(1, 4):\n    total += number\nprint(\"for total:\", total)\n\ncount = 0\nwhile count < 2:\n    count += 1\nprint(\"while count:\", count)",
+      "example_output": "for total: 6\nwhile count: 2",
+      "mcqs": [
+        {
+          "question": "How many times does for number in range(1, 4) run?",
+          "options": ["2", "3", "4", "5"],
+          "correct_answer": "B",
+          "explanation": "range(1, 4) produces 1, 2, and 3. The stop value 4 is excluded."
+        },
+        {
+          "question": "What does break do inside a loop?",
+          "options": ["Restarts the loop from its first item.", "Exits the nearest loop immediately.", "Skips only the current iteration.", "Pauses the program until input arrives."],
+          "correct_answer": "B",
+          "explanation": "break terminates the nearest enclosing loop. continue, in contrast, skips only the current iteration."
+        },
+        {
+          "question": "What must a program normally do in a while count < 3 loop to eventually finish?",
+          "options": ["Change count so the condition can become false.", "Replace while with print.", "Indent the condition further.", "Add an else block that is always true."],
+          "correct_answer": "A",
+          "explanation": "The loop condition is checked again after each iteration, so count must change until count < 3 is false."
+        }
+      ]
+    }
+  ]
+}

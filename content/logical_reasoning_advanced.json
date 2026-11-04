@@ -1,0 +1,166 @@
+{
+  "domain": "Logical Reasoning",
+  "level": "Advanced",
+  "topics": [
+    {
+      "title": "Second Differences and Recurrences",
+      "notes": [
+        "When first differences vary regularly, calculate second differences by subtracting neighboring first differences.",
+        "A constant second difference is evidence of a quadratic pattern, often involving n squared.",
+        "A recurrence defines each term using earlier terms, such as adding the previous two values.",
+        "Alternating operations may create separate subsequences; check positions independently before proposing one formula.",
+        "A finite list can fit multiple rules, so select the simplest rule supported by the question's context and verify every term."
+      ],
+      "example": "Terms: 1, 4, 9, 16, 25\nFirst differences: 3, 5, 7, 9\nSecond differences: 2, 2, 2",
+      "example_output": "Next difference: 11; next term: 36",
+      "mcqs": [
+        {
+          "question": "A sequence has first differences 4, 7, 10, 13. If this pattern continues, what is the next difference?",
+          "options": ["14", "15", "16", "17"],
+          "correct_answer": "C",
+          "explanation": "The differences increase by 3 each time, so the next is 13 + 3 = 16."
+        },
+        {
+          "question": "A sequence follows a(n) = a(n-1) + a(n-2), starting 1, 1, 2, 3, 5. What is the next term?",
+          "options": ["6", "7", "8", "10"],
+          "correct_answer": "C",
+          "explanation": "The rule adds the two previous terms: 3 + 5 = 8."
+        },
+        {
+          "question": "The second differences of a sequence are constant. Which type of pattern is commonly indicated?",
+          "options": ["A quadratic pattern", "A constant sequence only", "A random permutation", "A single repeated letter"],
+          "correct_answer": "A",
+          "explanation": "Constant second differences are characteristic of a quadratic sequence when terms are indexed at equal intervals."
+        }
+      ]
+    },
+    {
+      "title": "Complex Coding and Decoding",
+      "notes": [
+        "Advanced codes can combine a fixed shift with position changes, reverse the word, or apply different rules to alternating positions.",
+        "Separate the transformation into stages and record intermediate results so each operation can be reversed in the correct order.",
+        "If a code shifts positions differently, annotate each original index and compute each letter independently.",
+        "Encoding operations generally must be undone in reverse sequence when decoding, like reversing steps in a procedure.",
+        "Verify a candidate code on a second example when one is provided; a rule should explain both consistently."
+      ],
+      "example": "Word: BAD\nReverse: DAB\nShift each letter forward by 1: D→E, A→B, B→C",
+      "example_output": "BAD is coded as EBC",
+      "mcqs": [
+        {
+          "question": "A code first reverses a word and then shifts each letter forward by one. How is DOG coded?",
+          "options": ["GPE", "HPE", "HOF", "EOD"],
+          "correct_answer": "B",
+          "explanation": "Reverse DOG to GOD, then shift G→H, O→P, and D→E, giving HPE."
+        },
+        {
+          "question": "A code shifts letters forward by their position (+1, +2, +3). What is the encoded form of ACE?",
+          "options": ["BDF", "BEH", "ZBD", "BCE"],
+          "correct_answer": "B",
+          "explanation": "A moves +1 to B, C moves +2 to E, and E moves +3 to H, producing BEH."
+        },
+        {
+          "question": "If encoding applies a shift and then reverses the word, what order should decoding use?",
+          "options": ["Reverse first, then undo the shift", "Undo the shift first, then reverse", "Repeat the encoding exactly", "Sort the letters alphabetically"],
+          "correct_answer": "A",
+          "explanation": "Decoding reverses operations in reverse order: undo the final reversal first, then undo the earlier shift."
+        }
+      ]
+    },
+    {
+      "title": "Deduction with Family Relations",
+      "notes": [
+        "Complex family puzzles combine several relation chains. Name intermediate people and build one connection at a time.",
+        "Separate generation from sibling or spouse relationships; an aunt or uncle is one generation above a niece or nephew.",
+        "Use gender clues only where given. A sibling's gender may be unknown even when the relation category is certain.",
+        "Translate pronouns carefully: 'her brother's daughter' refers to the daughter of the person identified as her brother.",
+        "Check both the identity and direction of the final relation because 'How is X related to Y?' is not interchangeable with the reverse."
+      ],
+      "example": "Ira is the sister of Joon.\nJoon is the father of Kim.\nIra is Kim's father's sister.",
+      "example_output": "Ira is Kim's aunt",
+      "mcqs": [
+        {
+          "question": "Rhea is the brother of Sita. Sita is the mother of Tanu. How is Rhea related to Tanu?",
+          "options": ["Uncle", "Father", "Grandfather", "Cousin"],
+          "correct_answer": "A",
+          "explanation": "Rhea is Sita's brother, and Sita is Tanu's parent, so Rhea is Tanu's uncle."
+        },
+        {
+          "question": "Uma is the parent of Vasu. Vasu is the parent of Wren. What is Uma's relation to Wren?",
+          "options": ["Sibling", "Aunt or uncle", "Grandparent", "Cousin"],
+          "correct_answer": "C",
+          "explanation": "Uma is one generation above Vasu and two generations above Wren, so Uma is Wren's grandparent."
+        },
+        {
+          "question": "Zara is the daughter of Yuki. Yuki is the sister of Xavi. How is Xavi related to Zara if Xavi's gender is not stated?",
+          "options": ["Aunt or uncle", "Parent", "Sibling", "Grandparent"],
+          "correct_answer": "A",
+          "explanation": "Xavi is a sibling of Zara's parent. Because Xavi's gender is not stated, the neutral answer is aunt or uncle."
+        }
+      ]
+    },
+    {
+      "title": "Set Logic and Syllogistic Reasoning",
+      "notes": [
+        "Represent categories as sets: 'All A are B' means the A set is contained within B, not that the sets are identical.",
+        "A universal statement can be true even when its subject set is empty; it does not establish that any A exists.",
+        "'Some A are B' asserts at least one shared member, while 'No A are B' asserts the sets do not overlap.",
+        "To test a conclusion, try to construct a counterexample that satisfies every premise but makes the conclusion false.",
+        "Distinguish a conclusion that must follow from one that is merely possible; possibility alone is not logical entailment."
+      ],
+      "example": "Premise: All poets are readers.\nPremise: Some artists are poets.\nThose artists are also readers.",
+      "example_output": "Conclusion: Some artists are readers (valid)",
+      "mcqs": [
+        {
+          "question": "Premises: All A are B. Some C are A. What must follow?",
+          "options": ["Some C are B", "All C are B", "All B are C", "No C are B"],
+          "correct_answer": "A",
+          "explanation": "The members that are both C and A must also be B because every A belongs to B. Therefore some C are B."
+        },
+        {
+          "question": "Premises: No M are N. Some P are M. What follows?",
+          "options": ["Some P are not N", "All P are M", "Some N are M", "No P exist"],
+          "correct_answer": "A",
+          "explanation": "The P members that are M cannot be N, so at least some P are outside N."
+        },
+        {
+          "question": "Premise: All dragons are reptiles. Which conclusion is guaranteed?",
+          "options": ["All reptiles are dragons", "Some dragons exist", "Every dragon is a reptile", "No reptiles exist"],
+          "correct_answer": "C",
+          "explanation": "The premise directly states the set inclusion that every dragon is a reptile; it does not establish that dragons exist or that all reptiles are dragons."
+        }
+      ]
+    },
+    {
+      "title": "Constraint and Truth-Teller Puzzles",
+      "notes": [
+        "Translate each clue into a constraint and combine constraints before trying candidate arrangements.",
+        "For truth-teller puzzles, represent each person's statement as true or false and check whether the assumed statuses stay consistent.",
+        "A statement such as 'exactly one of A and B is true' is exclusive OR; it differs from 'at least one is true.'",
+        "Use contradiction: assume a candidate arrangement, then reject it if it violates any clue.",
+        "When a puzzle asks for a unique answer, test the remaining candidates to ensure no second arrangement satisfies all conditions."
+      ],
+      "example": "Exactly one of A and B is true.\nA says: “B is false.”\nIf A is true, B is false, satisfying the rule.",
+      "example_output": "A: true | B: false",
+      "mcqs": [
+        {
+          "question": "Exactly one of A and B is true. If A is true, what must be B?",
+          "options": ["True", "False", "Both true", "Cannot be determined"],
+          "correct_answer": "B",
+          "explanation": "The phrase exactly one excludes the case where both are true. If A is the true one, B must be false."
+        },
+        {
+          "question": "A says, “B is lying.” B says, “A and I are both telling the truth.” If each person always tells the truth or always lies, which assignment is consistent?",
+          "options": ["A true, B true", "A true, B false", "A false, B true", "A false, B false"],
+          "correct_answer": "B",
+          "explanation": "If A is truthful, B is lying. Then B's claim that both are truthful is false, matching B's liar status. The other assignments contradict a statement."
+        },
+        {
+          "question": "A seating puzzle has constraints A before B and B before C. Which order is required among these three?",
+          "options": ["C, B, A", "B, A, C", "A, B, C", "A, C, B"],
+          "correct_answer": "C",
+          "explanation": "Combining the two ordering constraints gives A before B before C."
+        }
+      ]
+    }
+  ]
+}

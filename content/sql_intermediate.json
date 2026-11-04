@@ -1,0 +1,166 @@
+{
+  "domain": "SQL",
+  "level": "Intermediate",
+  "topics": [
+    {
+      "title": "Combining Conditions and NULL Logic",
+      "notes": [
+        "AND requires every joined condition to be true; OR requires at least one. Parentheses control how mixed conditions are grouped.",
+        "NOT reverses a true or false condition. SQL conditions involving NULL can be unknown rather than true or false.",
+        "Use IS NULL and IS NOT NULL for missing values. Ordinary comparisons such as rating = NULL evaluate to unknown.",
+        "COALESCE(value, replacement) returns the first non-NULL argument, which is useful for displaying a fallback.",
+        "Write predicates carefully around NULL: a WHERE clause keeps only rows whose condition is true, not false or unknown."
+      ],
+      "example": "SELECT name, COALESCE(nickname, 'No nickname') AS display_name\nFROM members\nWHERE active = TRUE\n  AND (points >= 100 OR nickname IS NOT NULL);",
+      "example_output": "name | display_name\nAva  | Ace\nMia  | No nickname",
+      "mcqs": [
+        {
+          "question": "What does COALESCE(nickname, 'No nickname') return when nickname is NULL?",
+          "options": ["NULL", "An empty string in every SQL dialect", "No nickname", "The word COALESCE"],
+          "correct_answer": "C",
+          "explanation": "COALESCE returns the first non-NULL argument. When nickname is NULL, it uses the fallback text."
+        },
+        {
+          "question": "Why should a query use score IS NULL instead of score = NULL?",
+          "options": ["NULL is tested with IS NULL because comparisons with NULL produce unknown", "Equals is only for text", "IS NULL sorts missing values", "The two forms always mean the same thing"],
+          "correct_answer": "A",
+          "explanation": "NULL represents unknown or missing information, so ordinary equality does not evaluate to true; IS NULL is the dedicated test."
+        },
+        {
+          "question": "In A AND (B OR C), when is the complete condition true?",
+          "options": ["Only when A is true and at least one of B or C is true", "Whenever A is false", "Only when all three are false", "Whenever B is true, regardless of A"],
+          "correct_answer": "A",
+          "explanation": "The parentheses evaluate B OR C first; the outer AND then requires A and that grouped result to be true."
+        }
+      ]
+    },
+    {
+      "title": "Aggregate Filters with HAVING",
+      "notes": [
+        "Aggregate functions summarize a set of rows: COUNT, SUM, AVG, MIN, and MAX are common examples.",
+        "GROUP BY creates groups before aggregate values are calculated. A grouped query returns one row per group.",
+        "WHERE filters source rows before grouping; HAVING filters groups after their aggregates are available.",
+        "An aggregate in HAVING can express conditions such as keeping only departments with at least three employees.",
+        "COUNT(column) ignores NULL values in that column, whereas COUNT(*) counts input rows."
+      ],
+      "example": "SELECT department, AVG(salary) AS average_salary\nFROM employees\nWHERE active = TRUE\nGROUP BY department\nHAVING COUNT(*) >= 2\nORDER BY average_salary DESC;",
+      "example_output": "department | average_salary\nDesign     | 72000\nSupport    | 51000",
+      "mcqs": [
+        {
+          "question": "At what stage does HAVING filter rows?",
+          "options": ["Before WHERE", "After groups and their aggregate values are formed", "Before the FROM table is read", "Only after the result is printed"],
+          "correct_answer": "B",
+          "explanation": "HAVING applies to grouped results, so aggregate calculations such as COUNT are available to its condition."
+        },
+        {
+          "question": "What is the main difference between WHERE and HAVING?",
+          "options": ["WHERE filters input rows; HAVING filters groups", "WHERE sorts rows; HAVING joins tables", "WHERE counts rows; HAVING renames columns", "There is no difference"],
+          "correct_answer": "A",
+          "explanation": "WHERE is evaluated on individual rows before grouping, while HAVING is evaluated on the resulting groups."
+        },
+        {
+          "question": "What does COUNT(email) omit when calculating a group total?",
+          "options": ["Rows where email is NULL", "Rows with a numeric id", "Rows that match WHERE", "All duplicate rows"],
+          "correct_answer": "A",
+          "explanation": "COUNT(column) counts only non-NULL values in that column; COUNT(*) counts all rows in the group."
+        }
+      ]
+    },
+    {
+      "title": "Join Types and Relationship Cardinality",
+      "notes": [
+        "INNER JOIN keeps matching pairs. LEFT JOIN keeps every left-side row and fills right-side columns with NULL when there is no match.",
+        "A one-to-many relationship can create several output rows for one left-side row, one for each matching right-side row.",
+        "A right-table condition in WHERE can remove unmatched LEFT JOIN rows, making the result behave like an INNER JOIN.",
+        "To retain unmatched left rows while filtering matches, put the right-side match condition in the ON clause when appropriate.",
+        "COUNT(right_table.id) after a LEFT JOIN counts matches because unmatched rows have a NULL right-side id."
+      ],
+      "example": "SELECT customers.name, orders.id AS order_id\nFROM customers\nLEFT JOIN orders\n  ON orders.customer_id = customers.id\nORDER BY customers.id, orders.id;",
+      "example_output": "name | order_id\nAva  | 201\nAva  | 202\nNoah | NULL",
+      "mcqs": [
+        {
+          "question": "Which rows does a LEFT JOIN preserve?",
+          "options": ["All rows from the left table, with matching right rows when available", "Only rows that match in both tables", "All rows from the right table only", "Only rows with NULL keys"],
+          "correct_answer": "A",
+          "explanation": "LEFT JOIN keeps each left-side row. When there is no right-side match, the right-side output columns are NULL."
+        },
+        {
+          "question": "A customer has three matching orders. How many joined rows can that customer produce?",
+          "options": ["Always one", "Three, one per matching order", "Zero, because the relationship is one-to-many", "One row for every customer in the database"],
+          "correct_answer": "B",
+          "explanation": "A one-to-many join returns a row for each matching pair, so one customer can appear once for each of their orders."
+        },
+        {
+          "question": "Why can WHERE orders.status = 'paid' remove customers with no orders from a LEFT JOIN result?",
+          "options": ["Their orders.status is NULL, so the WHERE condition is not true", "LEFT JOIN never returns customers", "WHERE changes the join key", "NULL is automatically converted to 'paid'"],
+          "correct_answer": "A",
+          "explanation": "Unmatched rows have NULL for orders.status. The WHERE predicate is not true for those rows, so they are filtered out."
+        }
+      ]
+    },
+    {
+      "title": "Subqueries and Common Table Expressions",
+      "notes": [
+        "A subquery is a query nested inside another query. It can provide a value, a set of values, or a derived table.",
+        "IN checks whether a value matches any value returned by a subquery; EXISTS checks whether the subquery returns at least one row.",
+        "A correlated subquery refers to a value from the outer query and may be evaluated for each outer row.",
+        "A common table expression (CTE), introduced with WITH, gives a named query result that the main query can reuse.",
+        "Use a CTE to separate a multi-step query into readable parts; the database optimizer still chooses how to execute it."
+      ],
+      "example": "WITH department_totals AS (\n  SELECT department_id, AVG(salary) AS avg_salary\n  FROM employees\n  GROUP BY department_id\n)\nSELECT department_id, avg_salary\nFROM department_totals\nWHERE avg_salary > 60000;",
+      "example_output": "department_id | avg_salary\n10            | 72000\n30            | 65500",
+      "mcqs": [
+        {
+          "question": "What does the WITH keyword introduce in this example?",
+          "options": ["A common table expression with a name", "A new permanent database", "A transaction that cannot be ended", "A required index"],
+          "correct_answer": "A",
+          "explanation": "WITH defines a CTE, a named query result that can be referenced by the following statement."
+        },
+        {
+          "question": "What question does EXISTS answer?",
+          "options": ["Whether a subquery returns at least one row", "Whether every column is indexed", "Whether two text values are identical", "How many tables are in the database"],
+          "correct_answer": "A",
+          "explanation": "EXISTS is true when its subquery finds at least one row; it does not need to return a particular column value."
+        },
+        {
+          "question": "What makes a subquery correlated?",
+          "options": ["It refers to a column from the outer query", "It always returns exactly one row", "It cannot contain WHERE", "It creates a permanent table"],
+          "correct_answer": "A",
+          "explanation": "A correlated subquery uses a value from the surrounding query, linking its evaluation to an outer row."
+        }
+      ]
+    },
+    {
+      "title": "Safe Data Changes and Transactions",
+      "notes": [
+        "UPDATE changes existing rows and DELETE removes rows. Always inspect the WHERE condition carefully before running either statement.",
+        "Without a WHERE clause, UPDATE affects every row and DELETE removes every row in the target table.",
+        "A transaction groups changes so they can be committed together or rolled back together when something goes wrong.",
+        "COMMIT makes a transaction's changes durable; ROLLBACK abandons uncommitted changes.",
+        "Use a transaction and verify the affected rows when performing important multi-step data changes."
+      ],
+      "example": "BEGIN;\nUPDATE inventory\nSET quantity = quantity - 1\nWHERE item_id = 42 AND quantity > 0;\nCOMMIT;",
+      "example_output": "1 row updated\nTransaction committed",
+      "mcqs": [
+        {
+          "question": "What can happen when an UPDATE statement has no WHERE clause?",
+          "options": ["It updates every row in the target table", "It updates no rows in every database", "It automatically creates a backup", "It becomes a SELECT query"],
+          "correct_answer": "A",
+          "explanation": "Without a WHERE condition, every row qualifies for the UPDATE, so the statement can change the entire table."
+        },
+        {
+          "question": "What does ROLLBACK do to uncommitted changes in a transaction?",
+          "options": ["Discards them", "Makes them permanent", "Sorts them", "Copies them to every table"],
+          "correct_answer": "A",
+          "explanation": "ROLLBACK cancels the transaction's uncommitted changes, returning the database to its earlier transaction state."
+        },
+        {
+          "question": "Why place related data changes in one transaction?",
+          "options": ["To commit the set together or undo it together if needed", "To make every query return more rows", "To remove the need for conditions", "To turn DELETE into SELECT"],
+          "correct_answer": "A",
+          "explanation": "Transactions provide an all-together commit or rollback boundary for a related set of database changes."
+        }
+      ]
+    }
+  ]
+}

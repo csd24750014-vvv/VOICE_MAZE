@@ -1,0 +1,161 @@
+{
+  "domain": "Python",
+  "level": "Advanced",
+  "topics": [
+    {
+      "title": "Object-Oriented Design and Composition",
+      "notes": [
+        "A class defines behavior and data; each instance has its own attributes and shares class-defined methods.",
+        "self refers to the instance receiving a method call and is written explicitly as the first instance-method parameter.",
+        "Inheritance models a genuine is-a relationship; composition builds an object from cooperating components.",
+        "Prefer clear interfaces and small objects over deep inheritance chains that are difficult to change."
+      ],
+      "example": "class Cart:\n    def __init__(self):\n        self.items = []\n\n    def add(self, item):\n        self.items.append(item)\n\nclass Checkout:\n    def __init__(self, cart):\n        self.cart = cart\n\ncart = Cart()\ncart.add(\"book\")\ncheckout = Checkout(cart)\nprint(checkout.cart.items)",
+      "example_output": "['book']",
+      "mcqs": [
+        {
+          "question": "In Checkout(cart), what does composition mean in this example?",
+          "options": ["Checkout is a specialized kind of Cart.", "Checkout holds and collaborates with a Cart object.", "Cart inherits from Checkout.", "The two objects are automatically the same instance."],
+          "correct_answer": "B",
+          "explanation": "Checkout receives and stores a Cart object, which is a has-a relationship commonly modeled with composition."
+        },
+        {
+          "question": "Why is self the first parameter of an ordinary instance method?",
+          "options": ["Python uses it to provide the instance on which the method was called.", "It makes the method static.", "It stores the class name as a string.", "It prevents the method from accessing instance attributes."],
+          "correct_answer": "A",
+          "explanation": "Python binds the instance to the first parameter of an instance method, conventionally named self."
+        },
+        {
+          "question": "When is inheritance most appropriate?",
+          "options": ["Whenever two classes share one line of code.", "When a subtype truly can be used wherever its base type is expected.", "Whenever one object needs to store another object.", "Only to avoid defining an __init__ method."],
+          "correct_answer": "B",
+          "explanation": "Inheritance is useful for a genuine substitutable is-a relationship; collaboration between separate objects is usually composition."
+        }
+      ]
+    },
+    {
+      "title": "Decorators and Function Wrapping",
+      "notes": [
+        "A decorator accepts a callable and returns a callable, often adding behavior around the original call.",
+        "The @decorator syntax applies a decorator when a function or class is defined.",
+        "Use functools.wraps on an inner wrapper to preserve the decorated function's name and documentation.",
+        "Decorators are useful for cross-cutting behavior such as timing, logging, caching, or access checks."
+      ],
+      "example": "from functools import wraps\n\ndef announce(function):\n    @wraps(function)\n    def wrapper(*args, **kwargs):\n        print(\"Calling\", function.__name__)\n        return function(*args, **kwargs)\n    return wrapper\n\n@announce\ndef greet(name):\n    return f\"Hello, {name}\"\n\nprint(greet(\"Ada\"))",
+      "example_output": "Calling greet\nHello, Ada",
+      "mcqs": [
+        {
+          "question": "What callable is passed to announce when Python processes @announce above greet?",
+          "options": ["The result of calling greet with an empty string.", "The greet function object.", "The wrapper's return string.", "The module that contains greet."],
+          "correct_answer": "B",
+          "explanation": "Decorator syntax is equivalent to greet = announce(greet), so the original function object is passed to the decorator."
+        },
+        {
+          "question": "Why does the wrapper accept *args and **kwargs in a general-purpose decorator?",
+          "options": ["To forward arbitrary positional and keyword arguments to the wrapped function.", "To force every call to have exactly two arguments.", "To prevent the wrapped function from returning.", "To convert every argument into a string."],
+          "correct_answer": "A",
+          "explanation": "*args and **kwargs capture arbitrary call arguments and let the wrapper forward them to the original callable."
+        },
+        {
+          "question": "What does functools.wraps(function) primarily preserve on wrapper?",
+          "options": ["The wrapped function's useful metadata such as its name and docstring.", "All local variables from every call.", "The wrapped function's return value before it runs.", "The function's source file as executable bytecode."],
+          "correct_answer": "A",
+          "explanation": "wraps copies metadata such as __name__ and __doc__ and sets __wrapped__, improving introspection and documentation."
+        }
+      ]
+    },
+    {
+      "title": "Generators and Lazy Pipelines",
+      "notes": [
+        "A function containing yield produces a generator; calling it creates the generator without running its body to completion.",
+        "Each next() call resumes execution until the next yield, preserving local state between values.",
+        "Generators can process large or streaming inputs without storing every result at once.",
+        "A generator is normally exhausted after its values have been consumed; create another to iterate again."
+      ],
+      "example": "def squares(limit):\n    for number in range(limit):\n        yield number * number\n\nvalues = squares(3)\nfirst = next(values)\nsecond = next(values)\nremaining = list(values)\nprint(first, second, remaining)",
+      "example_output": "0 1 [4]",
+      "mcqs": [
+        {
+          "question": "What happens when squares(3) is called?",
+          "options": ["The function immediately returns the list [0, 1, 4].", "A generator object is created and its body runs as values are requested.", "The function prints three values.", "The call raises StopIteration immediately."],
+          "correct_answer": "B",
+          "explanation": "Calling a generator function returns a generator object; execution advances later when next() or iteration requests a value."
+        },
+        {
+          "question": "After first = next(values) and second = next(values), what does list(values) contain?",
+          "options": ["[0, 1, 4]", "[1, 4]", "[4]", "[]"],
+          "correct_answer": "C",
+          "explanation": "The first two next calls consume 0 and 1; the only remaining yielded square is 4."
+        },
+        {
+          "question": "What is a key memory advantage of processing records with a generator pipeline?",
+          "options": ["It can produce one item at a time instead of retaining all results in a list.", "It stores every intermediate result twice.", "It disables iteration.", "It automatically compresses all source files."],
+          "correct_answer": "A",
+          "explanation": "Generators yield values lazily, allowing a pipeline to process large streams without building every intermediate collection."
+        }
+      ]
+    },
+    {
+      "title": "Context Managers and Resource Safety",
+      "notes": [
+        "A context manager defines setup and cleanup behavior for a with statement.",
+        "An object's __enter__ method provides the value bound after as; __exit__ runs when the block finishes.",
+        "contextlib.contextmanager can turn a generator with one yield into a context manager.",
+        "Reliable cleanup belongs in the context manager so it runs after normal completion and exceptions."
+      ],
+      "example": "from contextlib import contextmanager\n\n@contextmanager\ndef managed_resource():\n    print(\"open\")\n    try:\n        yield \"sensor\"\n    finally:\n        print(\"close\")\n\nwith managed_resource() as active:\n    print(active, \"ready\")",
+      "example_output": "open\nsensor ready\nclose",
+      "mcqs": [
+        {
+          "question": "In a generator-based context manager, where should cleanup that must always happen normally be placed?",
+          "options": ["Before the yield statement.", "In a finally block surrounding the yield.", "After returning from the with statement.", "In the import statement."],
+          "correct_answer": "B",
+          "explanation": "A finally block runs when control leaves the managed with block, including when an exception is raised there."
+        },
+        {
+          "question": "What object is bound to active in with managed_resource(device) as active?",
+          "options": ["The value produced by the context manager's yield.", "The finally block.", "The exception type.", "Always the context manager function itself."],
+          "correct_answer": "A",
+          "explanation": "The value yielded by a contextlib.contextmanager generator becomes the value after as."
+        },
+        {
+          "question": "What is the purpose of the __exit__ method in a class-based context manager?",
+          "options": ["Perform exit-time cleanup and handle context exit semantics.", "Run before __enter__ to import the class.", "Create the object's constructor arguments.", "Repeat the with body until it succeeds."],
+          "correct_answer": "A",
+          "explanation": "__exit__ is called when the with suite ends and is responsible for cleanup and optional exception handling."
+        }
+      ]
+    },
+    {
+      "title": "Asynchronous Programming with asyncio",
+      "notes": [
+        "async def defines a coroutine function; calling it creates a coroutine that must be awaited or scheduled.",
+        "await suspends the current coroutine while an awaitable is incomplete, allowing the event loop to run other work.",
+        "asyncio.gather can run multiple awaitables concurrently when their results are needed together.",
+        "Async code is especially useful for I/O-bound tasks; ordinary CPU-heavy work still occupies the event-loop thread."
+      ],
+      "example": "import asyncio\n\nasync def fetch_label(delay, label):\n    await asyncio.sleep(delay)\n    return label\n\nasync def main():\n    labels = await asyncio.gather(\n        fetch_label(0.2, \"A\"), fetch_label(0.1, \"B\")\n    )\n    return labels\n\nlabels = asyncio.run(main())\nprint(labels)",
+      "example_output": "['A', 'B']",
+      "mcqs": [
+        {
+          "question": "What does calling fetch_label(0.2, \"A\") produce before it is awaited?",
+          "options": ["The string \"A\" immediately.", "A coroutine object representing work to run.", "A new operating-system thread.", "The integer 0.2."],
+          "correct_answer": "B",
+          "explanation": "Calling an async def function creates a coroutine object; it runs when awaited or scheduled on an event loop."
+        },
+        {
+          "question": "Why can asyncio.gather make the two fetch_label calls complete faster than awaiting each one in sequence?",
+          "options": ["Their waits can overlap while the event loop schedules other coroutines.", "It converts both calls into CPU instructions.", "It skips the sleep calls.", "It always creates one process per coroutine."],
+          "correct_answer": "A",
+          "explanation": "Both coroutines can be scheduled together, so their asynchronous waiting periods overlap rather than adding together."
+        },
+        {
+          "question": "What is a limitation of running CPU-heavy synchronous work directly inside an asyncio coroutine?",
+          "options": ["It can block the event loop and delay other coroutines.", "It is automatically distributed across all CPUs.", "It makes every await finish immediately.", "It cannot return a value."],
+          "correct_answer": "A",
+          "explanation": "CPU-bound synchronous code runs on the event-loop thread until it yields, so it can prevent other tasks from making progress."
+        }
+      ]
+    }
+  ]
+}

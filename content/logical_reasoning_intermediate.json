@@ -1,0 +1,166 @@
+{
+  "domain": "Logical Reasoning",
+  "level": "Intermediate",
+  "topics": [
+    {
+      "title": "Alternating and Difference Series",
+      "notes": [
+        "When consecutive differences are not constant, write down the differences as a second sequence.",
+        "If differences themselves change regularly, a second-level pattern may reveal the rule.",
+        "For alternating series, separate odd-position and even-position terms and inspect each subsequence.",
+        "A series can combine operations, such as multiplying and then adding; record each operation in order.",
+        "Check the proposed rule against every term, especially where one subsequence switches back to the other."
+      ],
+      "example": "Series: 2, 5, 10, 17, 26\nDifferences: 3, 5, 7, 9\nNext difference: 11",
+      "example_output": "Next term: 37",
+      "mcqs": [
+        {
+          "question": "What comes next in 1, 4, 9, 16, 25, ...?",
+          "options": ["30", "32", "36", "49"],
+          "correct_answer": "C",
+          "explanation": "These are squares 1², 2², 3², 4², and 5². The next is 6² = 36."
+        },
+        {
+          "question": "What comes next in 2, 10, 4, 12, 6, 14, ...?",
+          "options": ["8", "10", "16", "18"],
+          "correct_answer": "A",
+          "explanation": "The odd-position terms are 2, 4, 6 and the even-position terms are 10, 12, 14. The next odd-position term is 8."
+        },
+        {
+          "question": "What is the next term in 3, 6, 12, 24, ...?",
+          "options": ["30", "36", "42", "48"],
+          "correct_answer": "D",
+          "explanation": "Each term doubles, so 24 multiplied by 2 is 48."
+        }
+      ]
+    },
+    {
+      "title": "Position-Based Coding",
+      "notes": [
+        "Position-based codes change a letter according to where it appears in the word, rather than using one fixed shift.",
+        "A common rule shifts the first letter by one, the second by two, the third by three, and so on.",
+        "Write the shift beside each letter before applying it so position and alphabet movement do not get mixed up.",
+        "Reverse a position-based code by shifting each coded letter backward by its position number.",
+        "When a shifted letter crosses Z, use wrap-around only if the question's code uses a circular alphabet."
+      ],
+      "example": "Word: CAT\nPosition shifts: +1, +2, +3\nC→D, A→C, T→W",
+      "example_output": "CAT is coded as DCW",
+      "mcqs": [
+        {
+          "question": "Each letter shifts forward by its position: +1, +2, +3. How is MAP coded?",
+          "options": ["NDS", "NBR", "LZP", "NCS"],
+          "correct_answer": "D",
+          "explanation": "M moves to N, A moves forward two letters to C, and P moves forward three letters to S, giving NCS."
+        },
+        {
+          "question": "Using position shifts +1, +2, +3, what is the first letter's shift for a four-letter word?",
+          "options": ["+1", "+2", "+3", "+4"],
+          "correct_answer": "A",
+          "explanation": "The shift depends on each letter's position. The first letter is in position one, so it shifts by one."
+        },
+        {
+          "question": "A three-letter code uses shifts +1, +2, +3. How do you decode its second letter?",
+          "options": ["Shift it backward by 1", "Shift it backward by 2", "Shift it forward by 2", "Leave it unchanged"],
+          "correct_answer": "B",
+          "explanation": "The second character was moved forward by two during encoding, so reverse that step by moving it back two."
+        }
+      ]
+    },
+    {
+      "title": "Multi-Step Family Relations",
+      "notes": [
+        "For a chain of relations, start with the person named first and move one relationship at a time.",
+        "Translate phrases such as 'the daughter of my father's only son' by identifying the intermediate person before deciding the final relation.",
+        "A spouse relation does not by itself reveal a person's gender; use any stated gender information and no more.",
+        "Draw siblings on the same generation line and parents above them to avoid skipping a generation.",
+        "After solving, read the relation back in the requested direction: 'How is X related to Y?'"
+      ],
+      "example": "Asha is Ben's mother.\nBen is Cara's father.\nAsha is one generation above Ben.",
+      "example_output": "Asha is Cara's grandmother",
+      "mcqs": [
+        {
+          "question": "Mira is the sister of Kiran. Kiran is the mother of Leela. How is Mira related to Leela?",
+          "options": ["Mother", "Aunt", "Sister", "Grandmother"],
+          "correct_answer": "B",
+          "explanation": "Mira is the sister of Leela's mother, so Mira is Leela's aunt."
+        },
+        {
+          "question": "Arun is the father of Bala. Bala is the father of Chitra. How is Arun related to Chitra?",
+          "options": ["Uncle", "Brother", "Grandfather", "Cousin"],
+          "correct_answer": "C",
+          "explanation": "Arun is Bala's father and Bala is Chitra's father, placing Arun two generations above Chitra."
+        },
+        {
+          "question": "Nila is the daughter of Omar. Omar is the brother of Pavi. How is Pavi related to Nila?",
+          "options": ["Aunt or uncle", "Parent", "Sibling", "Grandparent"],
+          "correct_answer": "A",
+          "explanation": "Pavi is a sibling of Nila's parent Omar. The information does not specify Pavi's gender, so aunt or uncle is appropriate."
+        }
+      ]
+    },
+    {
+      "title": "Syllogisms and Valid Conclusions",
+      "notes": [
+        "A syllogism gives premises and asks what must follow. Accept the premises as true for the problem, even if they seem unusual.",
+        "All A are B means every A belongs to B; it does not mean every B is an A.",
+        "Some A are B means at least one A is also B, not that all A are B.",
+        "Use simple circles or sets to test whether a conclusion must be true, could be true, or cannot be true.",
+        "Do not add real-world assumptions that are not stated in the premises."
+      ],
+      "example": "Premises: All robins are birds.\nAll birds are animals.\nTherefore every robin is an animal.",
+      "example_output": "Conclusion: Valid",
+      "mcqs": [
+        {
+          "question": "Premises: All tulips are flowers. All flowers are plants. Which conclusion must be true?",
+          "options": ["All plants are tulips", "All tulips are plants", "No tulips are plants", "Some plants are not flowers"],
+          "correct_answer": "B",
+          "explanation": "Every tulip is included among flowers, and every flower is included among plants, so every tulip is a plant."
+        },
+        {
+          "question": "Premise: Some musicians are teachers. What must be true?",
+          "options": ["All musicians are teachers", "All teachers are musicians", "At least one musician is a teacher", "No musician is a teacher"],
+          "correct_answer": "C",
+          "explanation": "Some means at least one overlap exists. It does not imply that either full group is contained in the other."
+        },
+        {
+          "question": "Premises: All squares are rectangles. No circle is a rectangle. What follows?",
+          "options": ["Some circles are squares", "No square is a circle", "All rectangles are squares", "No circle exists"],
+          "correct_answer": "B",
+          "explanation": "Squares are inside the rectangle group, while circles are outside it. Therefore no square can be a circle."
+        }
+      ]
+    },
+    {
+      "title": "Ordering and Seating Puzzles",
+      "notes": [
+        "Convert each statement into a constraint before placing people or objects: 'A before B' is an ordering rule.",
+        "For line seating, draw positions and track whether the viewpoint is from the left or right end.",
+        "Place the strongest constraints first, such as fixed positions or people who must sit together.",
+        "Use remaining conditions to eliminate impossible arrangements rather than relying on intuition.",
+        "Check every clue against the final arrangement; a solution is valid only when all constraints hold."
+      ],
+      "example": "Order: Ana is before Bo.\nBo is before Cy.\nThe only order is Ana → Bo → Cy.",
+      "example_output": "First: Ana | Middle: Bo | Last: Cy",
+      "mcqs": [
+        {
+          "question": "Four people sit in a row. If Ana is left of Bo, which statement must be true?",
+          "options": ["Ana is immediately beside Bo", "Bo is somewhere to the right of Ana", "Ana is at the far left", "Bo is at the far right"],
+          "correct_answer": "B",
+          "explanation": "Left of establishes relative order but does not require the two seats to be adjacent or at an endpoint."
+        },
+        {
+          "question": "In a row of five seats, which seat is the middle seat?",
+          "options": ["Seat 1", "Seat 2", "Seat 3", "Seat 4"],
+          "correct_answer": "C",
+          "explanation": "The center of five ordered positions is position three, with two seats on each side."
+        },
+        {
+          "question": "Clues say D is before E and E is before F. What is the resulting order?",
+          "options": ["F, E, D", "E, D, F", "D, E, F", "D, F, E"],
+          "correct_answer": "C",
+          "explanation": "Combining the constraints gives D before E before F."
+        }
+      ]
+    }
+  ]
+}

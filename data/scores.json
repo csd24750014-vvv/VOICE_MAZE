@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "courses": {
+    "python_beginner": {
+      "domain": "Python",
+      "level": "Beginner",
+      "best_time_seconds": null,
+      "best_score": 1700,
+      "runs": [
+        {
+          "recorded_at": "2026-11-01T12:23:25.554540+00:00",
+          "score": 1700,
+          "accuracy": 88.24,
+          "elapsed_seconds": 296.36,
+          "completed": false
+        }
+      ]
+    }
+  }
+}

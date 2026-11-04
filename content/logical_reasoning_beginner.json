@@ -1,0 +1,166 @@
+{
+  "domain": "Logical Reasoning",
+  "level": "Beginner",
+  "topics": [
+    {
+      "title": "Number Series",
+      "notes": [
+        "A number series follows a rule. Compare neighboring terms first and ask what changes from one term to the next.",
+        "For an addition or subtraction pattern, calculate the difference between consecutive terms.",
+        "If differences are not constant, check whether the differences themselves follow a pattern or whether terms alternate between two rules.",
+        "Multiplication and division patterns are also common; compare ratios as well as differences.",
+        "Test a proposed rule against every displayed term before using it to predict the next one."
+      ],
+      "example": "Series: 3, 7, 11, 15, ?\nDifferences: +4, +4, +4\nNext term: 15 + 4",
+      "example_output": "19",
+      "mcqs": [
+        {
+          "question": "What number comes next in 2, 5, 8, 11, ...?",
+          "options": ["12", "13", "14", "15"],
+          "correct_answer": "C",
+          "explanation": "Each term increases by 3. Adding 3 to 11 gives 14."
+        },
+        {
+          "question": "What number comes next in 4, 8, 16, 32, ...?",
+          "options": ["36", "48", "60", "64"],
+          "correct_answer": "D",
+          "explanation": "Each term is multiplied by 2, so 32 multiplied by 2 is 64."
+        },
+        {
+          "question": "Which rule best describes 10, 8, 6, 4, ...?",
+          "options": ["Add 2 each time", "Subtract 2 each time", "Multiply by 2 each time", "Subtract 1 each time"],
+          "correct_answer": "B",
+          "explanation": "The difference between each pair of neighboring terms is -2."
+        }
+      ]
+    },
+    {
+      "title": "Alphabet Patterns",
+      "notes": [
+        "Letters can be treated as positions in the alphabet: A is 1, B is 2, and so on through Z as 26.",
+        "For a letter series, translate letters to positions and compare the numerical changes.",
+        "Some patterns alternate between two steps, such as moving forward one letter and then two letters.",
+        "When a pattern passes Z, check whether it wraps back to A; the question may specify a different convention.",
+        "Convert your predicted position back to a letter and verify that the same rule explains all given letters."
+      ],
+      "example": "Letter positions: A=1, C=3, E=5, G=7\nThe position increases by 2 each time.\nNext position: 9",
+      "example_output": "I",
+      "mcqs": [
+        {
+          "question": "Which letter comes next in B, D, F, H, ...?",
+          "options": ["I", "J", "K", "L"],
+          "correct_answer": "B",
+          "explanation": "The positions increase by two: 2, 4, 6, 8, so the next position is 10, letter J."
+        },
+        {
+          "question": "If A=1 and Z=26, what is the position of M?",
+          "options": ["11", "12", "13", "14"],
+          "correct_answer": "C",
+          "explanation": "Counting from A as position 1 makes M the thirteenth letter."
+        },
+        {
+          "question": "What comes next in A, C, F, J, ... if the jumps grow by one?",
+          "options": ["M", "N", "O", "P"],
+          "correct_answer": "C",
+          "explanation": "The jumps are +2, +3, and +4. The next jump is +5, taking J at position 10 to O at position 15."
+        }
+      ]
+    },
+    {
+      "title": "Coding and Decoding",
+      "notes": [
+        "A coding question transforms a message using a rule; decoding applies the reverse rule to recover it.",
+        "A common letter code shifts every letter forward or backward by the same number of alphabet positions.",
+        "Check at least two letter pairs to identify a shift instead of guessing from one example.",
+        "Other codes may reverse a word, swap positions, or replace letters with their alphabet numbers.",
+        "Apply the discovered rule consistently, including any wrap from Z to A when the code uses a circular alphabet."
+      ],
+      "example": "Rule: move each letter forward by 1\nC A T\nD B U",
+      "example_output": "CAT is coded as DBU",
+      "mcqs": [
+        {
+          "question": "Using a code that shifts every letter forward by one, how is DOG written?",
+          "options": ["EPH", "CNG", "EOG", "FPH"],
+          "correct_answer": "A",
+          "explanation": "D moves to E, O moves to P, and G moves to H, giving EPH."
+        },
+        {
+          "question": "If each coded letter is one letter after the original, how do you decode DBU?",
+          "options": ["CAT", "DOG", "BAT", "CAV"],
+          "correct_answer": "A",
+          "explanation": "Decoding reverses the forward shift: D becomes C, B becomes A, and U becomes T."
+        },
+        {
+          "question": "Under A=1, B=2, ..., what number code represents CAB?",
+          "options": ["3-1-2", "2-1-3", "3-2-1", "1-3-2"],
+          "correct_answer": "A",
+          "explanation": "C is position 3, A is position 1, and B is position 2."
+        }
+      ]
+    },
+    {
+      "title": "Blood Relations",
+      "notes": [
+        "Blood-relation questions describe a family tree in words. Identify each person and draw the relationships in small steps.",
+        "Track generations: parents are one level above their children, and siblings share a parent level.",
+        "The phrase 'my mother's brother' means the speaker's maternal uncle; follow each relationship from the stated person.",
+        "Do not assume a person's gender unless the question provides it. Use only the stated relationships.",
+        "Rewrite the question from the speaker's point of view after building the family links."
+      ],
+      "example": "Ravi is the father of Mina.\nMina is the sister of Dev.\nTherefore Ravi is also Dev's father.",
+      "example_output": "Ravi is Dev's father",
+      "mcqs": [
+        {
+          "question": "Lia is the mother of Sam. Sam is the brother of Jo. How is Lia related to Jo?",
+          "options": ["Sister", "Mother", "Aunt", "Grandmother"],
+          "correct_answer": "B",
+          "explanation": "Sam and Jo are siblings, so they share the stated mother Lia. Lia is Jo's mother."
+        },
+        {
+          "question": "Nia is Omar's sister. Omar is the father of Pia. How is Nia related to Pia?",
+          "options": ["Mother", "Sister", "Aunt", "Cousin"],
+          "correct_answer": "C",
+          "explanation": "Nia is the sister of Pia's father, so she is Pia's aunt."
+        },
+        {
+          "question": "Tara is the daughter of Uma. Uma is the son of Vik. How is Vik related to Tara?",
+          "options": ["Brother", "Uncle", "Grandparent", "Cousin"],
+          "correct_answer": "C",
+          "explanation": "Uma is Tara's parent and Vik is Uma's parent, so Vik is Tara's grandparent."
+        }
+      ]
+    },
+    {
+      "title": "Odd One Out and Classification",
+      "notes": [
+        "An odd-one-out problem asks which item does not share the main property of the others.",
+        "Compare items using a clear category such as shape, number property, use, or membership in a group.",
+        "For numbers, test simple properties such as even or odd, prime or composite, and square or non-square.",
+        "Choose the rule that explains the largest group with the fewest extra assumptions.",
+        "An item may fit multiple categories, so use the property most directly supported by all the choices."
+      ],
+      "example": "Items: 2, 3, 5, 9\n2, 3, and 5 are prime numbers.\n9 has factors 1, 3, and 9.",
+      "example_output": "Odd one out: 9 (it is composite)",
+      "mcqs": [
+        {
+          "question": "Which number is the odd one out: 2, 4, 6, 9?",
+          "options": ["2", "4", "6", "9"],
+          "correct_answer": "D",
+          "explanation": "2, 4, and 6 are even; 9 is odd."
+        },
+        {
+          "question": "Which shape is different: triangle, square, circle, rectangle?",
+          "options": ["Triangle", "Square", "Circle", "Rectangle"],
+          "correct_answer": "C",
+          "explanation": "The triangle, square, and rectangle have straight sides and corners; a circle has neither."
+        },
+        {
+          "question": "Which number is not a perfect square: 1, 4, 9, 12?",
+          "options": ["1", "4", "9", "12"],
+          "correct_answer": "D",
+          "explanation": "1, 4, and 9 are squares of 1, 2, and 3. Twelve is not the square of a whole number."
+        }
+      ]
+    }
+  ]
+}

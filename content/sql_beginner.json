@@ -1,0 +1,166 @@
+{
+  "domain": "SQL",
+  "level": "Beginner",
+  "topics": [
+    {
+      "title": "Selecting Columns with SELECT",
+      "notes": [
+        "SELECT tells the database which columns to return. Write the column names after SELECT and the table name after FROM.",
+        "Use SELECT * to inspect every column while learning a table, but prefer named columns in queries you keep and share.",
+        "Separate multiple column names with commas. Their order in SELECT determines their order in the result.",
+        "SQL keywords are commonly written in uppercase for readability; most database systems accept either case.",
+        "A query reads data without changing it. The rows shown are determined by the table and any filters or sorting that follow."
+      ],
+      "example": "SELECT name, age\nFROM students;",
+      "example_output": "name  | age\nAva   | 12\nNoah  | 13\nMia   | 12",
+      "mcqs": [
+        {
+          "question": "Which clause names the columns that should appear in a query result?",
+          "options": ["FROM", "SELECT", "WHERE", "ORDER BY"],
+          "correct_answer": "B",
+          "explanation": "SELECT is followed by the columns to return. FROM identifies the table where those columns are stored."
+        },
+        {
+          "question": "In SELECT name, age FROM students;, which table is read?",
+          "options": ["name", "age", "students", "SELECT"],
+          "correct_answer": "C",
+          "explanation": "The table name follows FROM. Here the query reads rows from students."
+        },
+        {
+          "question": "What does SELECT * ask for?",
+          "options": ["Only a column literally named star", "All columns from the selected table", "All tables in the database", "The first row only"],
+          "correct_answer": "B",
+          "explanation": "The asterisk is a wildcard for all columns of the table named in FROM."
+        }
+      ]
+    },
+    {
+      "title": "Filtering Rows with WHERE",
+      "notes": [
+        "WHERE keeps only rows whose condition is true, so put it after FROM and before any sorting clause.",
+        "Use = for equality, <> for not equal, and comparison operators such as >, <, >=, and <= for numeric values.",
+        "Text values and dates are written in single quotes in standard SQL; numbers are generally written without quotes.",
+        "Combine conditions with AND when both must be true, or OR when either may be true. Parentheses make mixed conditions clear.",
+        "NULL represents missing or unknown data. Test it with IS NULL or IS NOT NULL, not = NULL."
+      ],
+      "example": "SELECT name, score\nFROM students\nWHERE score >= 80 AND class = 'Blue';",
+      "example_output": "name | score\nAva  | 92\nMia  | 84",
+      "mcqs": [
+        {
+          "question": "Which clause filters rows according to a condition?",
+          "options": ["SELECT", "WHERE", "FROM", "AS"],
+          "correct_answer": "B",
+          "explanation": "WHERE evaluates a condition for each row and returns only rows for which the condition is true."
+        },
+        {
+          "question": "Which condition correctly finds rows with no value in email?",
+          "options": ["email = NULL", "email IS NULL", "email == NULL", "email IS EMPTY"],
+          "correct_answer": "B",
+          "explanation": "SQL uses IS NULL to test for a missing or unknown value; equality with NULL does not work as a normal comparison."
+        },
+        {
+          "question": "In a WHERE clause, what does score >= 80 mean?",
+          "options": ["The score is less than 80", "The score is exactly 80 only", "The score is 80 or greater", "The score is missing"],
+          "correct_answer": "C",
+          "explanation": "The >= operator means greater than or equal to, so it includes a score of 80 and all larger scores."
+        }
+      ]
+    },
+    {
+      "title": "Sorting Results with ORDER BY",
+      "notes": [
+        "ORDER BY sorts the rows returned by a query. It is placed after FROM and WHERE.",
+        "ASC sorts in ascending order and is the default: numbers go low to high and text usually goes A to Z.",
+        "DESC sorts in descending order, such as high scores first or names from Z to A.",
+        "You can sort by multiple columns. SQL uses later columns to break ties in earlier sort columns.",
+        "Sorting changes the order of the result, not the stored table. Add a unique tie-breaker when a stable order matters."
+      ],
+      "example": "SELECT name, score\nFROM students\nORDER BY score DESC, name ASC;",
+      "example_output": "name | score\nAva  | 92\nMia  | 84\nNoah | 84",
+      "mcqs": [
+        {
+          "question": "What is the default direction when ORDER BY does not specify ASC or DESC?",
+          "options": ["DESC", "ASC", "Random order", "No sorting is allowed"],
+          "correct_answer": "B",
+          "explanation": "Ascending order is the standard default when a sort direction is omitted."
+        },
+        {
+          "question": "Which direction places the largest score first?",
+          "options": ["ASC", "DESC", "FIRST", "TOP"],
+          "correct_answer": "B",
+          "explanation": "DESC sorts from larger values to smaller values, so the highest score appears first."
+        },
+        {
+          "question": "In ORDER BY score DESC, name ASC, when are names used to order rows?",
+          "options": ["Before score is considered", "Only to break ties between equal scores", "Only when a name is NULL", "Names are ignored"],
+          "correct_answer": "B",
+          "explanation": "SQL sorts by score first; rows with the same score are then sorted by name in ascending order."
+        }
+      ]
+    },
+    {
+      "title": "Counting and Summarizing with GROUP BY",
+      "notes": [
+        "GROUP BY collects rows that share a value, such as all students in the same class, so each group can be summarized.",
+        "Aggregate functions calculate one value from a group: COUNT counts rows, SUM adds numbers, and AVG calculates a mean.",
+        "When a query uses GROUP BY, selected columns are usually either grouped columns or aggregate results.",
+        "WHERE filters individual rows before groups are formed. HAVING filters the groups after aggregation.",
+        "COUNT(*) counts rows. COUNT(column) counts rows where that column is not NULL."
+      ],
+      "example": "SELECT class, COUNT(*) AS student_count\nFROM students\nGROUP BY class\nORDER BY class;",
+      "example_output": "class | student_count\nBlue  | 2\nGold  | 1",
+      "mcqs": [
+        {
+          "question": "What does GROUP BY class do in a summary query?",
+          "options": ["Sorts each student's name", "Forms one group for each distinct class value", "Deletes duplicate classes from the table", "Filters out every class except the first"],
+          "correct_answer": "B",
+          "explanation": "GROUP BY puts rows with the same class value into a group, allowing an aggregate such as COUNT to summarize each class."
+        },
+        {
+          "question": "Which function counts every row in each group, including rows with NULL values in some columns?",
+          "options": ["COUNT(*)", "SUM(*)", "AVG(*)", "GROUP(*)"],
+          "correct_answer": "A",
+          "explanation": "COUNT(*) counts rows themselves. COUNT(column) instead skips rows where that particular column is NULL."
+        },
+        {
+          "question": "Which clause filters groups after COUNT or another aggregate has been calculated?",
+          "options": ["WHERE", "HAVING", "FROM", "SELECT"],
+          "correct_answer": "B",
+          "explanation": "HAVING applies conditions to grouped results, while WHERE filters individual input rows before grouping."
+        }
+      ]
+    },
+    {
+      "title": "Combining Tables with JOIN",
+      "notes": [
+        "A JOIN combines related rows from two tables. A relationship is commonly expressed with a key stored in both tables.",
+        "INNER JOIN returns only rows where the join condition matches on both sides.",
+        "Use table aliases to keep queries shorter and qualify a column with its table alias when names could be ambiguous.",
+        "The ON clause states how the rows relate, for example students.class_id = classes.id.",
+        "A join can produce multiple rows when one row on one side matches several rows on the other; choose keys carefully."
+      ],
+      "example": "SELECT students.name, classes.room\nFROM students\nINNER JOIN classes\n  ON students.class_id = classes.id;",
+      "example_output": "name | room\nAva  | 12\nNoah | 14\nMia  | 12",
+      "mcqs": [
+        {
+          "question": "What does an INNER JOIN return?",
+          "options": ["Every possible pair of rows", "Rows whose join condition matches in both tables", "Only rows from the left table", "A count of all tables"],
+          "correct_answer": "B",
+          "explanation": "INNER JOIN keeps combinations of rows that satisfy the ON condition on both sides."
+        },
+        {
+          "question": "What is the purpose of the ON clause in a join?",
+          "options": ["It specifies how rows from the joined tables match", "It renames the database", "It sorts the result", "It chooses which columns are displayed"],
+          "correct_answer": "A",
+          "explanation": "ON holds the matching condition, often connecting a foreign key in one table to a key in another."
+        },
+        {
+          "question": "Why might a query write students.name instead of just name?",
+          "options": ["To show which table the column comes from", "To convert the name to a number", "To group names automatically", "To make the column a primary key"],
+          "correct_answer": "A",
+          "explanation": "Qualifying a column with its table name or alias makes its source clear, especially when both joined tables contain a column with that name."
+        }
+      ]
+    }
+  ]
+}

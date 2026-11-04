@@ -1,0 +1,166 @@
+{
+  "domain": "SQL",
+  "level": "Advanced",
+  "topics": [
+    {
+      "title": "Window Functions and Ranking",
+      "notes": [
+        "A window function calculates across related rows while keeping each input row in the result, unlike GROUP BY which collapses rows.",
+        "OVER defines a window. PARTITION BY resets the calculation for each group, while ORDER BY sets the order inside each group.",
+        "ROW_NUMBER assigns a unique sequence number; RANK gives ties the same rank and leaves gaps; DENSE_RANK gives ties the same rank without gaps.",
+        "The frame clause controls which ordered rows contribute to a frame-based aggregate such as a running sum.",
+        "Window functions are commonly calculated after WHERE and grouping, so filter their results in an outer query or CTE."
+      ],
+      "example": "SELECT employee, department, salary,\n       DENSE_RANK() OVER (\n         PARTITION BY department\n         ORDER BY salary DESC\n       ) AS salary_rank\nFROM employees;",
+      "example_output": "employee | department | salary | salary_rank\nAva      | Design     | 72000  | 1\nMia      | Design     | 68000  | 2\nNoah     | Support    | 51000  | 1",
+      "mcqs": [
+        {
+          "question": "Unlike GROUP BY, what does a window function normally preserve?",
+          "options": ["An output row for each input row being evaluated", "Only one row for the whole table", "The database's table definitions", "Only rows with duplicate values"],
+          "correct_answer": "A",
+          "explanation": "Window functions add a calculated value to rows without collapsing each partition into a single output row."
+        },
+        {
+          "question": "What does PARTITION BY department do in this ranking window?",
+          "options": ["Restarts the ranking independently for each department", "Deletes departments with one employee", "Sorts departments alphabetically only", "Combines every department into one rank"],
+          "correct_answer": "A",
+          "explanation": "PARTITION BY separates rows into windows. The rank calculation begins independently in each department."
+        },
+        {
+          "question": "How does DENSE_RANK handle ties compared with RANK?",
+          "options": ["It assigns distinct ranks to tied rows", "It gives tied rows the same rank and does not leave gaps afterward", "It removes tied rows", "It always returns zero"],
+          "correct_answer": "B",
+          "explanation": "DENSE_RANK gives equal values equal ranks and continues with the next consecutive rank; RANK leaves a gap after ties."
+        }
+      ]
+    },
+    {
+      "title": "Running Totals and Window Frames",
+      "notes": [
+        "A running total is a windowed SUM ordered by a sequence such as transaction date.",
+        "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW explicitly includes rows from the partition start through the current row.",
+        "Specify a deterministic ORDER BY, often with a unique id as a tie-breaker, so the running order is repeatable.",
+        "A frame determines which nearby rows contribute to a window aggregate; changing it changes the calculation without removing result rows.",
+        "For cumulative calculations, an explicit ROWS frame avoids relying on default frame behavior that may treat peer rows together."
+      ],
+      "example": "SELECT account_id, posted_at, amount,\n       SUM(amount) OVER (\n         PARTITION BY account_id\n         ORDER BY posted_at, transaction_id\n         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n       ) AS running_balance\nFROM transactions;",
+      "example_output": "account_id | posted_at | amount | running_balance\n7          | 2026-01-02 | 20     | 20\n7          | 2026-01-05 | -5     | 15\n7          | 2026-01-08 | 12     | 27",
+      "mcqs": [
+        {
+          "question": "What does UNBOUNDED PRECEDING mean in this cumulative frame?",
+          "options": ["Start at the first row of the current partition", "Start at the next row after the current row", "Use only the last row in the table", "Ignore all prior rows"],
+          "correct_answer": "A",
+          "explanation": "UNBOUNDED PRECEDING sets the frame's starting point to the beginning of the current window partition."
+        },
+        {
+          "question": "Why include transaction_id after posted_at in the window ORDER BY?",
+          "options": ["To make ordering deterministic when timestamps tie", "To remove rows with duplicate timestamps", "To change the amount to an id", "To partition by the id"],
+          "correct_answer": "A",
+          "explanation": "A unique tie-breaker specifies the order of rows that share a timestamp, making cumulative results repeatable."
+        },
+        {
+          "question": "What is the running balance after amounts 20, -5, and 12?",
+          "options": ["12", "15", "27", "32"],
+          "correct_answer": "C",
+          "explanation": "The cumulative values are 20, then 20 - 5 = 15, and finally 15 + 12 = 27."
+        }
+      ]
+    },
+    {
+      "title": "Indexes and Query Plans",
+      "notes": [
+        "An index is an auxiliary structure that can help a database locate rows or satisfy an ordering without scanning every row.",
+        "Indexes can speed reads but use storage and add work to INSERT, UPDATE, and DELETE operations because the index must stay current.",
+        "A composite index stores multiple key columns in a defined order; its leading columns are especially important to which predicates it can support.",
+        "Use EXPLAIN (or a database-specific plan tool) to inspect the strategy selected for a query rather than guessing from SQL text.",
+        "Index design should follow measured workloads and selective predicates; adding indexes indiscriminately can slow writes and maintenance."
+      ],
+      "example": "CREATE INDEX idx_orders_customer_date\nON orders (customer_id, order_date);\n\nEXPLAIN\nSELECT order_id, order_date\nFROM orders\nWHERE customer_id = 42\nORDER BY order_date;",
+      "example_output": "Query plan: index lookup on idx_orders_customer_date\nRows examined: matching customer rows",
+      "mcqs": [
+        {
+          "question": "What is a common cost of adding an index?",
+          "options": ["More storage and additional work when indexed data changes", "Every SELECT becomes slower", "The table can no longer be updated", "The index removes the need to store table rows"],
+          "correct_answer": "A",
+          "explanation": "Indexes consume storage and must be maintained during writes, so they trade write and storage cost for potential read benefits."
+        },
+        {
+          "question": "For an index on (customer_id, order_date), which predicate most directly uses its leading column?",
+          "options": ["WHERE customer_id = 42", "WHERE order_date = '2026-01-01' with no customer_id condition", "WHERE order_total > 100", "WHERE customer_name = 'Ava'"],
+          "correct_answer": "A",
+          "explanation": "The composite index is ordered first by customer_id, so a filter on that leading key is the most direct match."
+        },
+        {
+          "question": "What is EXPLAIN used for?",
+          "options": ["Inspecting how the database plans to execute a query", "Changing a SELECT into a DELETE", "Creating a new database user", "Guaranteeing a query is fast"],
+          "correct_answer": "A",
+          "explanation": "EXPLAIN exposes a query plan. It helps investigate execution choices but does not itself guarantee performance."
+        }
+      ]
+    },
+    {
+      "title": "Recursive Common Table Expressions",
+      "notes": [
+        "A recursive CTE repeatedly applies a query to the rows found in an earlier iteration, useful for trees and hierarchical relationships.",
+        "The anchor member provides the starting rows. The recursive member references the CTE and finds the next level.",
+        "UNION ALL combines the anchor and recursive rows without removing duplicates; use cycle protection when relationships may loop.",
+        "A depth column can make traversal levels visible and can impose a safe maximum in systems that support such a condition.",
+        "Recursive syntax and recursion limits vary among database systems, so check the target database's documentation."
+      ],
+      "example": "WITH RECURSIVE team_tree AS (\n  SELECT id, manager_id, name, 0 AS depth\n  FROM employees\n  WHERE manager_id IS NULL\n  UNION ALL\n  SELECT e.id, e.manager_id, e.name, t.depth + 1\n  FROM employees AS e\n  JOIN team_tree AS t ON e.manager_id = t.id\n)\nSELECT name, depth FROM team_tree;",
+      "example_output": "name | depth\nRavi | 0\nAva  | 1\nMia  | 2",
+      "mcqs": [
+        {
+          "question": "Which part of a recursive CTE supplies its initial rows?",
+          "options": ["The anchor member", "The final ORDER BY", "The index definition", "The foreign key"],
+          "correct_answer": "A",
+          "explanation": "The anchor member starts the recursion. The recursive member uses those results to discover additional rows."
+        },
+        {
+          "question": "Why should a recursive hierarchy query consider cycles?",
+          "options": ["A cycle can cause repeated traversal without reaching a natural end", "Cycles automatically delete the root row", "Cycles prevent JOIN from working", "A cycle makes every depth equal to zero"],
+          "correct_answer": "A",
+          "explanation": "If relationships loop back to previously visited rows, recursion can keep revisiting them unless the query or data prevents cycles."
+        },
+        {
+          "question": "What does UNION ALL do between the anchor and recursive members?",
+          "options": ["Combines their rows without duplicate elimination", "Sorts both results alphabetically", "Keeps only the anchor rows", "Creates a permanent table"],
+          "correct_answer": "A",
+          "explanation": "UNION ALL appends rows without checking for duplicates, which is often used for recursive traversal."
+        }
+      ]
+    },
+    {
+      "title": "Constraints, Keys, and Data Integrity",
+      "notes": [
+        "A PRIMARY KEY uniquely identifies each row and cannot be NULL. A table has one primary-key constraint, which may contain multiple columns.",
+        "A FOREIGN KEY enforces a relationship by requiring referenced values to exist in a parent key, subject to the selected delete/update rules.",
+        "UNIQUE prevents duplicate key values; NOT NULL requires a value; CHECK enforces a Boolean rule on stored values.",
+        "Constraints protect data at the database boundary, including writes from different applications and concurrent users.",
+        "Choose ON DELETE behavior deliberately: CASCADE removes dependent rows, while RESTRICT or NO ACTION prevents deleting a referenced parent."
+      ],
+      "example": "CREATE TABLE enrollments (\n  student_id INTEGER NOT NULL,\n  course_id INTEGER NOT NULL,\n  grade INTEGER CHECK (grade BETWEEN 0 AND 100),\n  PRIMARY KEY (student_id, course_id),\n  FOREIGN KEY (student_id) REFERENCES students(id)\n);",
+      "example_output": "Valid: one enrollment per student and course\nRejected: duplicate key or grade outside 0–100",
+      "mcqs": [
+        {
+          "question": "What does the composite primary key (student_id, course_id) enforce here?",
+          "options": ["Each student can have only one course ever", "The same student-course pair cannot be stored twice", "Every course id must equal its student id", "Grades must be unique"],
+          "correct_answer": "B",
+          "explanation": "The pair of columns uniquely identifies an enrollment, preventing a duplicate enrollment for the same student and course."
+        },
+        {
+          "question": "What does a FOREIGN KEY constraint help guarantee?",
+          "options": ["A referenced parent value exists according to the constraint", "Every row is sorted by the foreign key", "The referenced table has no indexes", "All values in a column are unique automatically"],
+          "correct_answer": "A",
+          "explanation": "A foreign key enforces referential integrity by requiring referenced values to correspond to a key in the parent table."
+        },
+        {
+          "question": "Which constraint rejects a grade outside the inclusive range 0 through 100?",
+          "options": ["CHECK (grade BETWEEN 0 AND 100)", "ORDER BY grade", "DEFAULT 100", "FOREIGN KEY (grade)"],
+          "correct_answer": "A",
+          "explanation": "The CHECK condition is evaluated for stored rows and rejects values that are not between 0 and 100."
+        }
+      ]
+    }
+  ]
+}

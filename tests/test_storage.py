@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from utils.storage import load_scores, record_result
+from utils.storage import load_scores, record_result, unlocked_levels
 
 
 class ScoreStorageTests(unittest.TestCase):
@@ -39,6 +39,41 @@ class ScoreStorageTests(unittest.TestCase):
             self.assertEqual(
                 load_scores(Path(temporary_directory) / "not-created.json"),
                 {"version": 1, "courses": {}},
+            )
+
+    def test_difficulty_unlocks_sequentially_per_domain(self) -> None:
+        """Completing a course unlocks only the next level in that domain."""
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            score_path = Path(temporary_directory) / "scores.json"
+            self.assertEqual(
+                unlocked_levels("Python", score_path),
+                frozenset({"Beginner"}),
+            )
+            record_result("Python", "Beginner", 100, 100.0, 60.0, True, path=score_path)
+            self.assertEqual(
+                unlocked_levels("Python", score_path),
+                frozenset({"Beginner", "Intermediate"}),
+            )
+            self.assertEqual(
+                unlocked_levels("SQL", score_path),
+                frozenset({"Beginner"}),
+            )
+            record_result(
+                "Python", "Intermediate", 150, 100.0, 50.0, True, path=score_path
+            )
+            self.assertEqual(
+                unlocked_levels("Python", score_path),
+                frozenset({"Beginner", "Intermediate", "Advanced"}),
+            )
+
+    def test_incomplete_runs_do_not_unlock_a_new_difficulty(self) -> None:
+        """Only completed maze results advance difficulty progression."""
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            score_path = Path(temporary_directory) / "scores.json"
+            record_result("SQL", "Beginner", 90, 50.0, 80.0, False, path=score_path)
+            self.assertEqual(
+                unlocked_levels("SQL", score_path),
+                frozenset({"Beginner"}),
             )
 
 

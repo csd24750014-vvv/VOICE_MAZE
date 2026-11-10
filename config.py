@@ -49,15 +49,20 @@ FONTS = {
 TIMINGS = {
     "transition_seconds": 0.24,
     "toast_seconds": 2.8,
-    "command_cooldown_seconds": 0.9,
+    "command_cooldown_seconds": 0.35,
     "particle_lifetime_seconds": 3.2,
 }
 
 # Speech is captured in short windows so the microphone worker can stop promptly.
 VOICE = {
     "language": "en-US",
-    "listen_timeout_seconds": 1,
-    "phrase_limit_seconds": 5,
-    "ambient_calibration_seconds": 0.6,
+    "listen_timeout_seconds": 0.8,
+    "phrase_limit_seconds": 4,
+    "ambient_calibration_seconds": 0.4,
+    "dynamic_energy_ratio": 1.25,
+    "dynamic_energy_adjustment_damping": 0.1,
+    "pause_threshold_seconds": 0.38,
+    "non_speaking_duration_seconds": 0.24,
+    "phrase_threshold_seconds": 0.15,
     "fuzzy_match_threshold": 0.78,
 }

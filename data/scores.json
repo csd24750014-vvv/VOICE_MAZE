@@ -13,6 +13,35 @@
           "accuracy": 88.24,
           "elapsed_seconds": 296.36,
           "completed": false
+        },
+        {
+          "recorded_at": "2026-11-10T14:09:18.427160+00:00",
+          "score": 1350,
+          "accuracy": 85.71,
+          "elapsed_seconds": 135.08,
+          "completed": false
+        },
+        {
+          "recorded_at": "2026-11-10T14:46:45.133051+00:00",
+          "score": 1250,
+          "accuracy": 84.62,
+          "elapsed_seconds": 293.25,
+          "completed": false
+        }
+      ]
+    },
+    "python_advanced": {
+      "domain": "Python",
+      "level": "Advanced",
+      "best_time_seconds": null,
+      "best_score": 0,
+      "runs": [
+        {
+          "recorded_at": "2026-11-10T14:10:25.636379+00:00",
+          "score": 0,
+          "accuracy": 0.0,
+          "elapsed_seconds": 24.48,
+          "completed": false
         }
       ]
     }

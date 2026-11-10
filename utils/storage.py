@@ -33,6 +33,26 @@ def load_scores(path: Path | None = None) -> dict[str, Any]:
     return data
 
 
+def unlocked_levels(domain: str, path: Path | None = None) -> frozenset[str]:
+    """Return sequentially unlocked difficulty levels for one learning domain."""
+    if not isinstance(domain, str) or not domain.strip():
+        raise ValueError("A learning domain is required to check level progress.")
+    data = load_scores(path)
+    course_key = _slug(domain)
+    completed = {
+        course["level"].casefold()
+        for key, course in data["courses"].items()
+        if key.startswith(f"{course_key}_")
+        and any(run["completed"] for run in course["runs"])
+    }
+    unlocked = {"Beginner"}
+    if "beginner" in completed:
+        unlocked.add("Intermediate")
+    if "intermediate" in completed:
+        unlocked.add("Advanced")
+    return frozenset(unlocked)
+
+
 def record_result(
     domain: str,
     level: str,

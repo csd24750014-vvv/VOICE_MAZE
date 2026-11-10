@@ -11,11 +11,12 @@ _NEIGHBORS = ((1, 0), (-1, 0), (0, 1), (0, -1))
 
 @dataclass(frozen=True)
 class ValidationResult:
-    """Report a layout's structural errors and its found start-to-finish route."""
+    """Report a layout's structure, unique-route status, and found route."""
 
     valid: bool
     errors: Tuple[str, ...]
     route: Tuple[Position, ...] = ()
+    unique_route: bool = False
 
 
 def validate_maze(layout: MazeLayout) -> ValidationResult:
@@ -66,6 +67,9 @@ def validate_maze(layout: MazeLayout) -> ValidationResult:
     if route is None:
         errors.append("Start cannot reach finish.")
         return ValidationResult(False, tuple(errors))
+    unique_route = _is_connected_tree(layout)
+    if not unique_route:
+        errors.append("Walkable maze tiles must form one connected graph with a unique route.")
     route_set = set(route)
     for door_id in range(1, 6):
         door_position = layout.doors.get(door_id)
@@ -82,7 +86,7 @@ def validate_maze(layout: MazeLayout) -> ValidationResult:
             if position not in intended_set:
                 errors.append(f"Door {door_id} is missing from the authored intended route.")
 
-    return ValidationResult(not errors, tuple(errors), tuple(route))
+    return ValidationResult(not errors, tuple(errors), tuple(route), unique_route)
 
 
 def is_valid_maze(layout: MazeLayout) -> bool:
@@ -145,3 +149,32 @@ def _route_is_contiguous(route: Iterable[Position]) -> bool:
         abs(left[0] - right[0]) + abs(left[1] - right[1]) == 1
         for left, right in zip(positions, positions[1:])
     )
+
+
+def _is_connected_tree(layout: MazeLayout) -> bool:
+    """Confirm every open tile is connected and the walkable graph has no cycles."""
+    walkable = {
+        (x, y)
+        for y, row in enumerate(layout.grid)
+        for x, tile in enumerate(row)
+        if tile != WALL
+    }
+    if not walkable or layout.start not in walkable:
+        return False
+
+    visited = {layout.start}
+    queue = deque([layout.start])
+    edge_count = 0
+    while queue:
+        current = queue.popleft()
+        neighbors = [
+            (current[0] + dx, current[1] + dy)
+            for dx, dy in _NEIGHBORS
+            if (current[0] + dx, current[1] + dy) in walkable
+        ]
+        edge_count += len(neighbors)
+        for neighbor in neighbors:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+    return visited == walkable and edge_count // 2 == len(walkable) - 1

@@ -101,7 +101,11 @@ _FILLER_WORDS = {
     "wanna",
     "would",
     "you",
+    "okay",
+    "ok",
 }
+_NEGATION_WORDS = {"don't", "dont", "never", "not", "no", "cannot", "can't"}
+_START_WORDS = {"start", "begin", "launch", "enter", "play", "open"}
 
 
 @dataclass(frozen=True)
@@ -130,7 +134,12 @@ def parse_command(
     if not normalized:
         return None
 
+    if context != "answer" and _has_negated_command(normalized):
+        return VoiceCommand("cancel", None, normalized)
+
     if context == "answer":
+        if _has_negated_command(normalized):
+            return VoiceCommand("answer_text", normalized, normalized)
         command = _COMMANDS.get(normalized) or _OPTION_ONLY.get(normalized)
         if command is not None and command[0] == "option":
             return VoiceCommand(command[0], command[1], normalized)
@@ -138,6 +147,11 @@ def parse_command(
         if semantic is not None and semantic[0] == "option":
             return VoiceCommand(semantic[0], semantic[1], normalized)
         return VoiceCommand("answer_text", normalized, normalized)
+
+    if context in {"notes", "notes_final"}:
+        contextual = _notes_command(normalized, context)
+        if contextual is not None:
+            return VoiceCommand(contextual[0], contextual[1], normalized)
 
     command = _COMMANDS.get(normalized) or _OPTION_ONLY.get(normalized)
     if command is not None:
@@ -151,6 +165,85 @@ def parse_command(
     if match is not None:
         return VoiceCommand(match[0], match[1], normalized)
 
+    return None
+
+
+def _has_negated_command(phrase: str) -> bool:
+    """Reject commands explicitly preceded by a spoken negation."""
+    words = phrase.split()
+    command_words = (
+        _START_WORDS
+        | {
+            "go",
+            "continue",
+            "proceed",
+            "next",
+            "back",
+            "previous",
+            "quit",
+            "exit",
+            "leave",
+            "up",
+            "down",
+            "left",
+            "right",
+            "python",
+            "sql",
+            "logic",
+            "beginner",
+            "intermediate",
+            "advanced",
+            "choose",
+            "select",
+            "pick",
+            "option",
+            "choice",
+            "answer",
+            "a",
+            "b",
+            "c",
+            "d",
+        }
+    )
+    for index, word in enumerate(words):
+        if word in _NEGATION_WORDS or (
+            word == "do" and index + 1 < len(words) and words[index + 1] == "not"
+        ):
+            start = index + 1
+            if word == "do":
+                start += 1
+            if any(next_word in command_words for next_word in words[start : start + 5]):
+                return True
+    return False
+
+
+def _notes_command(
+    phrase: str,
+    context: str,
+) -> Optional[tuple[str, Optional[str]]]:
+    """Interpret short proceed phrases according to the current notes page."""
+    words = set(phrase.split())
+    starts_maze = bool(words & _START_WORDS) or (
+        words & {"maze", "labyrinth"}
+        and words & {"go", "continue", "proceed", "resume"}
+    )
+    if starts_maze:
+        return ("start_maze", None)
+
+    if words & {"next", "page", "topic"}:
+        if words & {"back", "previous", "prior"}:
+            return ("back", None)
+        return ("next", None)
+
+    continuation = bool(words & {"continue", "proceed", "advance"}) or (
+        {"go", "on"}.issubset(words)
+    ) or ({"go", "ahead"}.issubset(words)) or (
+        {"let's", "go"}.issubset(words)
+    )
+    if "ready" in words:
+        return ("start_maze", None)
+    if continuation:
+        return ("start_maze", None) if context == "notes_final" else ("next", None)
     return None
 
 
@@ -168,6 +261,7 @@ class CommandParser:
         self.threshold = threshold
         self._clock = clock
         self._last_accepted_at: dict[tuple[str, Optional[str]], float] = {}
+        self.was_suppressed = False
 
     def parse(
         self,
@@ -176,6 +270,7 @@ class CommandParser:
         now: Optional[float] = None,
     ) -> Optional[VoiceCommand]:
         """Parse one phrase and suppress valid commands within the cooldown."""
+        self.was_suppressed = False
         command = parse_command(phrase, context=context, threshold=self.threshold)
         if command is None:
             return None
@@ -186,6 +281,7 @@ class CommandParser:
             last_accepted_at is not None
             and current_time - last_accepted_at < self.cooldown_seconds
         ):
+            self.was_suppressed = True
             return None
         self._last_accepted_at[command_key] = current_time
         return command
@@ -282,6 +378,12 @@ def _semantic_command(phrase: str) -> Optional[tuple[str, Optional[str]]]:
         "get",
     }:
         return ("results", None)
+    if (
+        {"go", "on"}.issubset(words)
+        or {"go", "ahead"}.issubset(words)
+        or {"let's", "go"}.issubset(words)
+    ):
+        return ("start", None)
 
     domain_terms = {
         "python": ("select_domain", "Python"),

@@ -74,7 +74,7 @@ class MenuScene(BaseScene):
         draw_text(
             surface,
             "VOICE",
-            (width // 2, height // 2 - 172),
+            (width // 2, height // 2 - 95),
             size=76,
             color=COLORS["text"],
             role="heading",
@@ -83,7 +83,7 @@ class MenuScene(BaseScene):
         draw_text(
             surface,
             "MAZE",
-            (width // 2, height // 2 - 88),
+            (width // 2, height // 2 - 90),
             size=76,
             color=COLORS["cyan"],
             role="heading",

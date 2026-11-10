@@ -3,12 +3,23 @@
 from dataclasses import dataclass
 from queue import Empty, Queue
 from threading import Event, Thread
-from typing import Literal, Optional
+from typing import Literal, Optional, Protocol
 
 import config
 from voice.mic_status import MicStatus
 
 VoiceMessageKind = Literal["recognized", "unrecognized", "error"]
+
+
+class _ConfigurableRecognizer(Protocol):
+    """SpeechRecognition settings required by the voice capture loop."""
+
+    dynamic_energy_threshold: bool
+    dynamic_energy_ratio: float
+    dynamic_energy_adjustment_damping: float
+    pause_threshold: float
+    non_speaking_duration: float
+    phrase_threshold: float
 
 
 @dataclass(frozen=True)
@@ -82,12 +93,14 @@ class VoiceListener:
             import speech_recognition as sr
 
             recognizer = sr.Recognizer()
+            _configure_recognizer(recognizer)
             with sr.Microphone() as microphone:
                 self.status.set("processing", "Calibrating microphone noise.")
                 recognizer.adjust_for_ambient_noise(
                     microphone,
                     duration=config.VOICE["ambient_calibration_seconds"],
                 )
+                request_error_reported = False
                 while not self._stop_event.is_set():
                     self.status.set("listening", "Listening for a voice command.")
                     try:
@@ -119,10 +132,13 @@ class VoiceListener:
                             "Use the mouse to keep playing."
                         )
                         self.status.set("error", message)
-                        self.messages.put(VoiceMessage("error", message))
-                        break
+                        if not request_error_reported:
+                            self.messages.put(VoiceMessage("error", message))
+                            request_error_reported = True
+                        continue
 
                     if phrase:
+                        request_error_reported = False
                         self.messages.put(VoiceMessage("recognized", phrase))
                 if self._stop_event.is_set():
                     self.status.set("idle", "Voice input is paused.")
@@ -140,3 +156,15 @@ class VoiceListener:
             )
             self.status.set("error", message)
             self.messages.put(VoiceMessage("error", message))
+
+
+def _configure_recognizer(recognizer: _ConfigurableRecognizer) -> None:
+    """Tune SpeechRecognition for quiet speech and shorter command pauses."""
+    recognizer.dynamic_energy_threshold = True
+    recognizer.dynamic_energy_ratio = config.VOICE["dynamic_energy_ratio"]
+    recognizer.dynamic_energy_adjustment_damping = config.VOICE[
+        "dynamic_energy_adjustment_damping"
+    ]
+    recognizer.pause_threshold = config.VOICE["pause_threshold_seconds"]
+    recognizer.non_speaking_duration = config.VOICE["non_speaking_duration_seconds"]
+    recognizer.phrase_threshold = config.VOICE["phrase_threshold_seconds"]

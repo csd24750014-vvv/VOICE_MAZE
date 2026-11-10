@@ -23,6 +23,9 @@ class NaturalCommandTests(unittest.TestCase):
                 command = parse_command(phrase)
                 self.assertIsNotNone(command)
                 self.assertEqual(command.action, "start")
+        for phrase in ("ok go on", "go ahead", "let's go"):
+            with self.subTest(phrase=phrase):
+                self.assertEqual(parse_command(phrase).action, "start")
 
     def test_domain_and_level_paraphrases(self) -> None:
         """Recognize subject and difficulty choices inside natural sentences."""
@@ -78,6 +81,43 @@ class NaturalCommandTests(unittest.TestCase):
                 self.assertIsNotNone(command)
                 self.assertEqual(command.action, expected)
 
+    def test_notes_accept_flexible_start_and_continue_phrases(self) -> None:
+        """Map flexible proceed phrases to the action available on each notes page."""
+        for phrase in ("start", "start learning", "start the game", "begin the maze"):
+            with self.subTest(phrase=phrase):
+                command = parse_command(phrase, context="notes")
+                self.assertEqual(command.action, "start_maze")
+
+        for phrase in ("ok go on", "go ahead", "continue"):
+            with self.subTest(phrase=phrase):
+                command = parse_command(phrase, context="notes_final")
+                self.assertEqual(command.action, "start_maze")
+
+        self.assertEqual(
+            parse_command("ok go on", context="notes").action,
+            "next",
+        )
+        self.assertEqual(
+            parse_command("next topic", context="notes_final").action,
+            "next",
+        )
+
+    def test_negated_start_commands_do_not_start(self) -> None:
+        """Never treat an explicit refusal as permission to start."""
+        for phrase in (
+            "don't start",
+            "do not start",
+            "please don't start the maze",
+            "I do not want to start yet",
+            "don't go on",
+        ):
+            with self.subTest(phrase=phrase):
+                self.assertEqual(parse_command(phrase).action, "cancel")
+                self.assertEqual(
+                    parse_command(phrase, context="notes_final").action,
+                    "cancel",
+                )
+
     def test_answers_preserve_text_and_accept_spoken_choices(self) -> None:
         """Keep quiz answer text intact and recognize letter-choice paraphrases."""
         self.assertEqual(
@@ -115,6 +155,21 @@ class NaturalCommandTests(unittest.TestCase):
         repeated = parser.parse("start the game")
         self.assertEqual(first.action, "start")
         self.assertIsNone(repeated)
+        self.assertTrue(parser.was_suppressed)
+
+    def test_repeated_next_topic_works_after_a_short_pause(self) -> None:
+        """Allow learners to advance pages again without waiting a full second."""
+        parser = CommandParser(clock=lambda: 0.0)
+        first = parser.parse("next topic", now=10.0)
+        too_soon = parser.parse("next topic", now=10.2)
+
+        self.assertEqual(first.action, "next")
+        self.assertIsNone(too_soon)
+        self.assertTrue(parser.was_suppressed)
+
+        second = parser.parse("next topic", now=10.36)
+        self.assertEqual(second.action, "next")
+        self.assertFalse(parser.was_suppressed)
 
     def test_cooldown_does_not_block_a_different_intent(self) -> None:
         """Allow a domain or direction command immediately after another action."""

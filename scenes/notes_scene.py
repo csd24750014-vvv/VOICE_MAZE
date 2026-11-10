@@ -17,6 +17,14 @@ if TYPE_CHECKING:
 class NotesScene(BaseScene):
     """Present topic notes and examples before the player starts the maze."""
 
+    TOPIC_ACCENTS = (
+        COLORS["cyan"],
+        COLORS["purple"],
+        COLORS["green"],
+        COLORS["pink"],
+        COLORS["yellow"],
+    )
+
     def __init__(self, game: "Game") -> None:
         """Load the selected course notes and prepare page-navigation controls."""
         super().__init__(game)
@@ -39,6 +47,10 @@ class NotesScene(BaseScene):
         elif command.action == "start_maze":
             self._start_maze()
 
+    def command_context(self) -> str:
+        """Tell the parser whether a proceed phrase means next topic or maze."""
+        return "notes_final" if self.page_index == 4 else "notes"
+
     def handle_event(self, event: pygame.event.Event) -> None:
         """Handle mouse page navigation and the course-selection back action."""
         self._layout_buttons()
@@ -53,7 +65,7 @@ class NotesScene(BaseScene):
 
             self.game.scenes.change(LevelScene(self.game))
             return
-        if self._next_button.handle_event(event):
+        if self.page_index < 4 and self._next_button.handle_event(event):
             self._next_page()
             return
         if self._start_button.handle_event(event):
@@ -72,12 +84,31 @@ class NotesScene(BaseScene):
         width, height = surface.get_size()
         self._layout_buttons()
         page_label = f"{self.page_index + 1} / 5"
+        accent = self.TOPIC_ACCENTS[self.page_index]
+        progress_x = 68
+        progress_y = 153
+        progress_width = min(390, width // 3)
+        progress_gap = 7
+        segment_width = (progress_width - progress_gap * 4) // 5
+        for index in range(5):
+            segment = pygame.Rect(
+                progress_x + index * (segment_width + progress_gap),
+                progress_y,
+                segment_width,
+                6,
+            )
+            segment_color = (
+                self.TOPIC_ACCENTS[index]
+                if index <= self.page_index
+                else COLORS["surface_light"]
+            )
+            pygame.draw.rect(surface, segment_color, segment, border_radius=3)
         draw_text(
             surface,
             f"TOPIC  {page_label}",
             (width - 72, 150),
-            size=15,
-            color=COLORS["cyan"],
+            size=14,
+            color=accent,
             role="heading",
             align="topright",
         )
@@ -103,12 +134,13 @@ class NotesScene(BaseScene):
             ).draw(surface)
         else:
             topic = self.topics[self.page_index]
-            self._draw_topic(surface, content_rect, topic)
+            self._draw_topic(surface, content_rect, topic, accent)
 
         self._back_button.rect.topleft = (68, height - 126)
         self._back_button.draw(surface)
-        self._next_button.rect.topleft = (width - 68 - 190 - 232, height - 126)
-        self._next_button.draw(surface)
+        if self.page_index < 4:
+            self._next_button.rect.topleft = (width - 68 - 190 - 232, height - 126)
+            self._next_button.draw(surface)
         self._start_button.rect.topleft = (width - 68 - 220, height - 126)
         self._start_button.draw(surface)
         if self.page_index >= 4:
@@ -126,6 +158,7 @@ class NotesScene(BaseScene):
         surface: pygame.Surface,
         rect: pygame.Rect,
         topic: dict[str, Any],
+        accent: tuple[int, int, int],
     ) -> None:
         """Display scrollable lesson bullets beside complete code and output."""
         shadow = rect.move(0, 7)
@@ -135,11 +168,11 @@ class NotesScene(BaseScene):
             rect,
             COLORS["surface"],
             radius=20,
-            border_color=COLORS["border"],
+            border_color=accent,
         )
         pygame.draw.rect(
             surface,
-            COLORS["purple"],
+            accent,
             pygame.Rect(rect.x + 1, rect.y + 18, 4, rect.height - 36),
             border_radius=3,
         )
@@ -167,10 +200,10 @@ class NotesScene(BaseScene):
             "KEY IDEAS  •  SCROLL TO REVIEW",
             (notes_rect.x + 16, notes_rect.y + 12),
             size=11,
-            color=COLORS["cyan"],
+            color=accent,
             role="heading",
         )
-        note_font = font(14)
+        note_font = font(15)
         note_line_height = 18
         note_y = notes_rect.y + 38
         note_max_width = notes_rect.width - 52
@@ -202,7 +235,7 @@ class NotesScene(BaseScene):
                 "•",
                 (notes_rect.x + 16, note_y),
                 size=17,
-                color=COLORS["purple"],
+                color=accent,
                 role="heading",
             )
             for line_index, line in enumerate(lines):
@@ -290,7 +323,7 @@ class NotesScene(BaseScene):
                 line,
                 (code_rect.x + 14, code_rect.y + 31 + line_index * code_line_height),
                 size=code_font_size,
-                color=COLORS["green"] if "=" in line else COLORS["text"],
+                color=accent if "=" in line or "def " in line or "class " in line else COLORS["text"],
                 role="mono",
             )
         draw_rounded_rect(
@@ -305,7 +338,7 @@ class NotesScene(BaseScene):
             "EXPECTED OUTPUT",
             (output_rect.x + 14, output_rect.y + 9),
             size=10,
-            color=COLORS["purple"],
+            color=accent,
             role="heading",
         )
         output_font = font(12, "mono")

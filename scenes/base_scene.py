@@ -6,7 +6,7 @@ import pygame
 
 from core.scene_manager import Scene
 from ui.components import MicIndicator, Toast
-from ui.theme import COLORS, draw_rounded_rect, draw_text
+from ui.theme import COLORS, draw_rounded_rect, draw_text, font
 from voice.commands import VoiceCommand
 
 if TYPE_CHECKING:
@@ -36,7 +36,13 @@ class BaseScene(Scene):
                     context=self.command_context(),
                 )
                 if command is None:
-                    self.toast.show("Say that again", COLORS["yellow"])
+                    if not self.game.command_parser.was_suppressed:
+                        self.toast.show(
+                            "I didn’t catch that. Try a short command.",
+                            COLORS["yellow"],
+                        )
+                elif command.action == "cancel":
+                    self.toast.show("Okay, I won’t do that.", COLORS["yellow"])
                 else:
                     self.handle_command(command)
             elif message.kind == "unrecognized":
@@ -112,37 +118,68 @@ class BaseScene(Scene):
         self.mic_indicator.draw(surface, pygame.Rect(width - 230, 32, 178, 42))
 
         footer = pygame.Rect(30, height - 57, width - 60, 38)
+        caption = self.caption.replace("\n", " ").strip()
+        mic_status = self.game.mic_status.snapshot()
+        if mic_status.state == "error":
+            status_width = min(390, max(280, width // 3))
+            caption_width = footer.width - status_width - 12
+            caption_rect = pygame.Rect(
+                footer.x,
+                footer.y,
+                caption_width,
+                footer.height,
+            )
+            status_rect = pygame.Rect(
+                caption_rect.right + 12,
+                footer.y,
+                status_width,
+                footer.height,
+            )
+            draw_rounded_rect(
+                surface,
+                status_rect,
+                COLORS["surface"],
+                radius=12,
+                border_color=COLORS["red"],
+            )
+            notice = mic_status.message
+            while notice and font(12).size(notice)[0] > status_rect.width - 24:
+                notice = notice[:-4].rstrip() + "..."
+            draw_text(
+                surface,
+                notice,
+                (status_rect.x + 12, status_rect.centery),
+                size=12,
+                color=COLORS["red"],
+                align="midleft",
+            )
+        else:
+            caption_rect = footer
         draw_rounded_rect(
             surface,
-            footer,
+            caption_rect,
             COLORS["surface"],
             radius=12,
             border_color=COLORS["border"],
         )
-        caption = self.caption.replace("\n", " ").strip()
-        if len(caption) > 74:
-            caption = f"{caption[:71]}..."
+        max_caption_width = caption_rect.width - 30
+        caption_font = font(14)
+        while caption and caption_font.size(f"You said: {caption}")[0] > max_caption_width:
+            caption = caption[:-4].rstrip() + "..."
         draw_text(
             surface,
             f"You said: {caption or '...'}",
-            (footer.x + 15, footer.centery),
+            (caption_rect.x + 15, caption_rect.centery),
             size=14,
             color=COLORS["text_muted"],
             align="midleft",
         )
-        mic_status = self.game.mic_status.snapshot()
-        if mic_status.state == "error":
-            notice = mic_status.message
-            if len(notice) > 80:
-                notice = f"{notice[:77]}..."
-            draw_text(
-                surface,
-                notice,
-                (footer.right - 15, footer.centery),
-                size=13,
-                color=COLORS["red"],
-                align="midright",
+        if self.toast.visible:
+            toast_width = min(460, width - 64)
+            toast_rect = pygame.Rect(
+                (width - toast_width) // 2,
+                height - 112,
+                toast_width,
+                42,
             )
-        elif self.toast.visible:
-            toast_rect = pygame.Rect(width // 2 - 200, height - 110, 400, 42)
             self.toast.draw(surface, toast_rect)

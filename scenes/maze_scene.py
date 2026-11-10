@@ -137,8 +137,10 @@ class MazeScene(BaseScene):
     def _draw_board(self, surface: pygame.Surface) -> None:
         """Render walls, open paths, five animated doors, and the glowing player."""
         width, height = surface.get_size()
-        cell_size = min(29, (height - 240) // self.layout.height, (width - 570) // self.layout.width)
-        cell_size = max(18, cell_size)
+        cell_size = max(
+            1,
+            min(29, (height - 240) // self.layout.height, (width - 570) // self.layout.width),
+        )
         board_width = cell_size * self.layout.width
         board_height = cell_size * self.layout.height
         board_x = 56
@@ -283,8 +285,10 @@ class MazeScene(BaseScene):
     def _draw_hud(self, surface: pygame.Surface) -> None:
         """Show elapsed time, attempts, gate progress, and directional controls."""
         width, height = surface.get_size()
-        cell_size = min(29, (height - 240) // self.layout.height, (width - 570) // self.layout.width)
-        cell_size = max(18, cell_size)
+        cell_size = max(
+            1,
+            min(29, (height - 240) // self.layout.height, (width - 570) // self.layout.width),
+        )
         board_x = 56
         sidebar_x = board_x + cell_size * self.layout.width + 42
         sidebar_width = width - sidebar_x - 52
@@ -369,8 +373,10 @@ class MazeScene(BaseScene):
     def _layout_controls(self) -> None:
         """Position persistent D-pad buttons inside the HUD sidebar."""
         width, height = self.game.screen.get_size()
-        cell_size = min(29, (height - 240) // self.layout.height, (width - 570) // self.layout.width)
-        cell_size = max(18, cell_size)
+        cell_size = max(
+            1,
+            min(29, (height - 240) // self.layout.height, (width - 570) // self.layout.width),
+        )
         sidebar_x = 56 + cell_size * self.layout.width + 42
         sidebar_width = width - sidebar_x - 52
         button_size = min(62, max(46, (sidebar_width - 24) // 3))

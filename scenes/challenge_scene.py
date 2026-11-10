@@ -50,6 +50,7 @@ class ChallengeScene(BaseScene):
         self.question_index = 0
         self._feedback = ""
         self._feedback_remaining = 0.0
+        self._feedback_correct = False
         self._success_pending = False
         self._revision_open = False
         self._option_buttons: list[Button] = []
@@ -142,14 +143,14 @@ class ChallengeScene(BaseScene):
         for button in self._option_buttons:
             button.draw(surface)
         progress = ProgressBar(
-            pygame.Rect(100, height - 90, width - 200, 8),
+            pygame.Rect(100, height - 78, width - 200, 8),
             self.question_index,
             3,
             COLORS["purple"],
         )
         progress.draw(surface)
         if self._feedback:
-            color = COLORS["green"] if self._success_pending else COLORS["red"]
+            color = COLORS["green"] if self._feedback_correct else COLORS["red"]
             draw_text(
                 surface,
                 self._feedback,
@@ -252,6 +253,7 @@ class ChallengeScene(BaseScene):
         """Track an answer, then continue or show topic revision for a mistake."""
         question = self.questions[self.question_index]
         is_correct = selected_index == correct_option_index(question)
+        self._feedback_correct = is_correct
         self.game.state.record_answer(
             is_correct,
             points=(
@@ -300,6 +302,7 @@ class ChallengeScene(BaseScene):
         """Restart this door's full three-question set after revision."""
         self.question_index = 0
         self._feedback = ""
+        self._feedback_correct = False
         self._success_pending = False
         self._revision_open = False
 

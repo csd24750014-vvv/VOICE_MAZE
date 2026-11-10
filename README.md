@@ -80,9 +80,9 @@ python main.py
 
 ## Play
 
-1. Select **Start Learning**, then choose a domain and difficulty.
+1. Select **Start Learning**, then choose a domain. Only Beginner is initially unlocked. Complete the Beginner maze to unlock Intermediate, then complete Intermediate to unlock Advanced; this progress is saved per domain. An unfinished run does not unlock the next level.
 2. Read all five lesson pages. Each page contains key ideas, an example, and its expected output. Use the mouse wheel over the notes panel to scroll longer notes.
-3. Start the maze. A directional command follows the open corridor and stops at the next junction, wall, locked door, or finish, so it will not skip a turn.
+3. Start the maze. Every course uses a deterministic, perfect maze: all walkable tiles are connected, there are no loops or shortcuts, and exactly one path leads from start to finish. Beginner uses a 9×9 cell maze; Intermediate uses 11×11; Advanced uses 13×13. Larger levels have more turns and dead ends. A directional command follows the open corridor and stops at the next junction, wall, locked door, or finish.
 4. Answer each door's three questions by saying an option or its answer. All three questions must be correct to unlock that topic door.
 5. If an answer is wrong, review that door's topic and try again. Each level gives two attempts.
 6. Results show completion, score, accuracy, elapsed time, and the saved best completion time. Score history is stored under `data/scores.json`.
@@ -94,12 +94,14 @@ The game accepts natural phrasings and short commands. The examples below are su
 | Main menu | “Start”, “start the game”, “start learning”, “how to play”, “quit” |
 | Choose a domain | “Python”, “go with SQL”, “I want to learn logical reasoning” |
 | Choose a difficulty | “Beginner”, “medium difficulty”, “hardest level” |
-| Learning notes | “Next”, “next page”, “back”, “start maze” |
+| Learning notes | “Next”, “next page”, “back”, “start”, “start the maze”; on the final page, “OK go on”, “go ahead”, or “continue” |
 | Move in the maze | “Up”, “go right”, “move down”, “turn left”, “north” |
 | Answer a question | “Option A”, “I choose B”, “option C”, or say the answer text |
 | Revision and results | “Try again”, “return to maze”, “view results”, “play again”, “main menu” |
 
-Voice captions appear as **You said** at the bottom of the screen. The microphone badge shows whether the application is listening, processing, or has encountered a microphone error. Google speech recognition needs a working internet connection; the game does not require speech to continue and provides mouse alternatives.
+Voice captions appear as **You said** at the bottom of the screen. The microphone badge shows whether the application is listening, processing, or has encountered a microphone error. Voice capture adapts its sensitivity to room noise and uses a shorter pause before submitting a phrase. Speak in a normal voice near the microphone, wait briefly for the **Listening** badge before speaking, and pause momentarily between commands. Google speech recognition needs a working internet connection; the game does not require speech to continue and provides mouse alternatives.
+
+On learning notes, saying **“start”** or **“start the game”** requests the maze; the game still requires all five topics to be reviewed first. On the final notes page, “OK go on”, “go ahead”, and “continue” also start the maze. Explicit refusals such as “don’t start” are not treated as start commands. A temporary Google recognition outage no longer permanently stops the microphone worker; voice recognition can resume when the service becomes available again.
 
 ### Mouse and keyboard
 

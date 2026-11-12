@@ -9,6 +9,7 @@ import pygame
 from scenes.base_scene import BaseScene
 from scenes.level_scene import LevelScene
 from scenes.notes_scene import NotesScene
+from scenes.revision_scene import RevisionScene
 from ui.components import Button, Toast
 from ui.theme import draw_text, font, wrap_text
 
@@ -68,6 +69,69 @@ class LearningScreenLayoutTests(unittest.TestCase):
         self.assertEqual(
             [button.enabled for button in scene._buttons],
             [True, False, False],
+        )
+
+    def test_level_cards_show_the_current_maze_sizes(self) -> None:
+        """Difficulty cards match the compact cell counts used by the game."""
+        with patch(
+            "scenes.level_scene.unlocked_levels",
+            return_value=frozenset({"Beginner"}),
+        ):
+            scene = LevelScene(self.game)
+        rendered_text: list[str] = []
+        original_draw_text = draw_text
+
+        def capture_text(*args: object, **kwargs: object) -> pygame.Rect:
+            rendered_text.append(str(args[1]))
+            return original_draw_text(*args, **kwargs)
+
+        with patch("scenes.level_scene.draw_text", side_effect=capture_text):
+            scene.draw(self.surface)
+
+        self.assertIn("5 × 5 cells  •  5 topic doors", rendered_text)
+        self.assertIn("7 × 7 cells  •  5 topic doors", rendered_text)
+        self.assertIn("9 × 9 cells  •  5 topic doors", rendered_text)
+
+    def test_revision_notes_and_code_fit_inside_their_panels(self) -> None:
+        """Long revision text is wrapped or fitted instead of overflowing."""
+        scene = RevisionScene(
+            self.game,
+            {
+                "title": "Variables",
+                "notes": [
+                    "A long learning note " * 12,
+                    "Another long learning note " * 12,
+                    "A third long learning note " * 12,
+                    "A fourth long learning note " * 12,
+                    "A fifth long learning note " * 12,
+                ],
+                "example": "result = " + "some_long_value " * 18,
+            },
+            wrong_question="Which value is stored?",
+            explanation="The variable name refers to the value stored in memory.",
+            retry_available=True,
+            on_retry=lambda: None,
+            on_results=lambda: None,
+            on_cancel=lambda: None,
+        )
+        drawn_bounds: list[pygame.Rect] = []
+        original_draw_text = draw_text
+
+        def capture_text(*args: object, **kwargs: object) -> pygame.Rect:
+            bounds = original_draw_text(*args, **kwargs)
+            drawn_bounds.append(bounds)
+            return bounds
+
+        with patch("scenes.revision_scene.draw_text", side_effect=capture_text):
+            scene.draw(self.surface)
+
+        self.assertTrue(drawn_bounds)
+        self.assertTrue(
+            all(
+                0 <= bounds.left <= bounds.right <= self.surface.get_width()
+                and 0 <= bounds.top <= bounds.bottom <= self.surface.get_height()
+                for bounds in drawn_bounds
+            )
         )
 
     def test_voice_caption_and_error_have_separate_footer_panels(self) -> None:

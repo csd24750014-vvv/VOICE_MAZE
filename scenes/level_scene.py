@@ -19,6 +19,7 @@ class LevelScene(BaseScene):
     """Let the learner select beginner, intermediate, or advanced content."""
 
     LEVELS = ("Beginner", "Intermediate", "Advanced")
+    MAZE_CELL_COUNTS = (5, 7, 9)
     DESCRIPTIONS = (
         "Learn the maze with a short, guided route.",
         "Navigate extra turns and misleading dead ends.",
@@ -200,10 +201,10 @@ class LevelScene(BaseScene):
                 size=16,
                 color=description_color,
             )
-        maze_cells = (9, 11, 13)[index]
+        maze_cells = self.MAZE_CELL_COUNTS[index]
         draw_text(
             surface,
-            f"{maze_cells} × {maze_cells} maze  •  5 topic doors",
+            f"{maze_cells} × {maze_cells} cells  •  5 topic doors",
             (rect.x + 24, rect.y + 158),
             size=13,
             color=active_accent,

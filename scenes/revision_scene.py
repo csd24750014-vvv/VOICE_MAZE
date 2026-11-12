@@ -6,7 +6,7 @@ import pygame
 
 from scenes.base_scene import BaseScene
 from ui.components import Button, Card
-from ui.theme import COLORS, draw_rounded_rect, draw_text
+from ui.theme import COLORS, draw_rounded_rect, draw_text, fit_text, font, wrap_text
 from voice.commands import VoiceCommand
 
 if TYPE_CHECKING:
@@ -95,23 +95,45 @@ class RevisionScene(BaseScene):
             color=COLORS["cyan"],
             role="heading",
         )
-        for index, note in enumerate(self.topic["notes"]):
+        example_rect = pygame.Rect(
+            card_rect.x + 30,
+            card_rect.bottom - 116,
+            card_rect.width - 60,
+            94,
+        )
+        note_font = font(15)
+        note_width = card_rect.width - 84
+        note_lines = [
+            wrapped
+            for note in self.topic["notes"]
+            for wrapped in wrap_text(f"•  {note}", note_font, note_width)
+        ]
+        line_height = 20
+        notes_top = note_y + 29
+        notes_bottom = example_rect.top - 10
+        max_note_lines = max(0, (notes_bottom - notes_top) // line_height)
+        if len(note_lines) > max_note_lines:
+            note_lines = note_lines[:max_note_lines]
+            if note_lines:
+                note_lines[-1] = fit_text(
+                    note_lines[-1] + "...",
+                    note_font,
+                    note_width,
+                )
+        previous_clip = surface.get_clip()
+        surface.set_clip(
+            pygame.Rect(card_rect.x + 24, notes_top, card_rect.width - 48, max(0, notes_bottom - notes_top))
+        )
+        for index, line in enumerate(note_lines):
             draw_text(
                 surface,
-                f"•  {note}",
-                (card_rect.x + 34, note_y + 29 + index * 29),
-                size=16,
+                line,
+                (card_rect.x + 34, notes_top + index * line_height),
+                size=15,
                 color=COLORS["text"],
             )
-        self._draw_example(
-            surface,
-            pygame.Rect(
-                card_rect.x + 30,
-                card_rect.bottom - 116,
-                card_rect.width - 60,
-                94,
-            ),
-        )
+        surface.set_clip(previous_clip)
+        self._draw_example(surface, example_rect)
         self._layout_buttons()
         self._primary.draw(surface)
         if self.retry_available:
@@ -143,11 +165,12 @@ class RevisionScene(BaseScene):
             color=COLORS["purple"],
             role="heading",
         )
+        example_font = font(14, "mono")
         lines = str(self.topic["example"]).splitlines()[:2]
         for index, line in enumerate(lines):
             draw_text(
                 surface,
-                line[:120],
+                fit_text(line, example_font, rect.width - 36),
                 (rect.x + 18, rect.y + 35 + index * 22),
                 size=14,
                 color=COLORS["green"] if "=" in line else COLORS["text"],

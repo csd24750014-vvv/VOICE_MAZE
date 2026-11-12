@@ -143,16 +143,6 @@ class NotesScene(BaseScene):
             self._next_button.draw(surface)
         self._start_button.rect.topleft = (width - 68 - 220, height - 126)
         self._start_button.draw(surface)
-        if self.page_index >= 4:
-            draw_text(
-                surface,
-                "Say “start maze” when you’re ready.",
-                (width // 2, height - 66),
-                size=14,
-                color=COLORS["text_muted"],
-                align="center",
-            )
-
     def _draw_topic(
         self,
         surface: pygame.Surface,

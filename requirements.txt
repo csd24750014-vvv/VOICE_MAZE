@@ -1,3 +1,4 @@
 pygame>=2.5.2
 SpeechRecognition>=3.10.4
 PyAudio>=0.2.14
+vosk>=0.3.45

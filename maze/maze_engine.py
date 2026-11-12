@@ -112,10 +112,16 @@ class MazeEngine:
         return tuple(directions)
 
     def unlock_door(self, door_id: int) -> None:
-        """Unlock a valid door after its challenge has been passed."""
+        """Remove a completed gate and step onto it when the player is adjacent."""
         if isinstance(door_id, bool) or door_id not in self.layout.doors:
             raise ValueError(f"Maze has no door numbered {door_id}.")
         self._unlocked_doors.add(door_id)
+        door_position = self.layout.doors[door_id]
+        if sum(
+            abs(current - target)
+            for current, target in zip(self.player_position, door_position)
+        ) == 1:
+            self.player_position = door_position
 
     def reset(self) -> None:
         """Restore the start position and relock every course door."""

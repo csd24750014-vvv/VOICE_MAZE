@@ -42,6 +42,55 @@ def draw_text(
     return bounds
 
 
+def wrap_text(
+    text: str,
+    text_font: pygame.font.Font,
+    max_width: int,
+) -> list[str]:
+    """Wrap words to a pixel width and split unbroken tokens when required."""
+    if max_width <= 0:
+        return [""]
+    lines: list[str] = []
+    for paragraph in text.splitlines() or [""]:
+        current = ""
+        for word in paragraph.split():
+            candidate = f"{current} {word}".strip()
+            if text_font.size(candidate)[0] <= max_width:
+                current = candidate
+                continue
+            if current:
+                lines.append(current)
+                current = ""
+            while text_font.size(word)[0] > max_width:
+                part = ""
+                for character in word:
+                    if part and text_font.size(part + character)[0] > max_width:
+                        lines.append(part)
+                        part = character
+                    else:
+                        part += character
+                word = part
+            current = word
+        lines.append(current)
+    return lines
+
+
+def fit_text(
+    text: str,
+    text_font: pygame.font.Font,
+    max_width: int,
+) -> str:
+    """Shorten one-line text with an ellipsis until it fits its pixel width."""
+    if max_width <= 0:
+        return ""
+    if text_font.size(text)[0] <= max_width:
+        return text
+    shortened = text.rstrip()
+    while shortened and text_font.size(shortened + "...")[0] > max_width:
+        shortened = shortened[:-1].rstrip()
+    return shortened + "..." if shortened else ""
+
+
 def draw_rounded_rect(
     surface: pygame.Surface,
     rect: pygame.Rect,

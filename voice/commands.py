@@ -106,6 +106,54 @@ _FILLER_WORDS = {
 }
 _NEGATION_WORDS = {"don't", "dont", "never", "not", "no", "cannot", "can't"}
 _START_WORDS = {"start", "begin", "launch", "enter", "play", "open"}
+_OFFLINE_PHRASES = {
+    "start the game",
+    "start learning",
+    "start the maze",
+    "begin the game",
+    "begin the maze",
+    "go on",
+    "okay go on",
+    "ok go on",
+    "go ahead",
+    "lets go",
+    "let us go",
+    "continue to the maze",
+    "move to the next topic",
+    "move to the next page",
+    "go to the next topic",
+    "go to the next page",
+    "show me how to play",
+    "how do i play",
+    "choose python",
+    "go with python",
+    "learn python",
+    "choose sql",
+    "go with sql",
+    "learn sql",
+    "choose logic",
+    "choose logical reasoning",
+    "go with logical reasoning",
+    "learn logical reasoning",
+    "easiest level",
+    "easy level",
+    "medium level",
+    "medium difficulty",
+    "hard level",
+    "hardest level",
+    "move forward",
+    "go forward",
+    "turn left",
+    "turn right",
+    "go straight",
+    "walk straight",
+    "move backward",
+    "go backward",
+    "don't start",
+    "do not start",
+    "don't go on",
+    "do not go on",
+}
 
 
 @dataclass(frozen=True)
@@ -115,6 +163,15 @@ class VoiceCommand:
     action: str
     value: Optional[str] = None
     heard: str = ""
+
+
+def offline_command_phrases() -> frozenset[str]:
+    """Provide parser phrases for the offline recognizer's command grammar."""
+    return frozenset(
+        phrase
+        for phrase in (*_COMMANDS, *_OPTION_ONLY, *_OFFLINE_PHRASES)
+        if phrase.isascii()
+    )
 
 
 def normalize_phrase(phrase: str) -> str:

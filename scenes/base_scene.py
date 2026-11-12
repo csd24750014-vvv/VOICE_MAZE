@@ -6,7 +6,7 @@ import pygame
 
 from core.scene_manager import Scene
 from ui.components import MicIndicator, Toast
-from ui.theme import COLORS, draw_rounded_rect, draw_text, font
+from ui.theme import COLORS, draw_rounded_rect, draw_text, fit_text, font, wrap_text
 from voice.commands import VoiceCommand
 
 if TYPE_CHECKING:
@@ -28,6 +28,7 @@ class BaseScene(Scene):
     def update(self, delta_seconds: float) -> None:
         """Consume speech results without waiting on the microphone worker."""
         del delta_seconds
+        self.game.voice_listener.set_command_context(self.command_context())
         for message in self.game.voice_listener.drain_messages():
             if message.kind == "recognized":
                 self.caption = message.text
@@ -38,7 +39,8 @@ class BaseScene(Scene):
                 if command is None:
                     if not self.game.command_parser.was_suppressed:
                         self.toast.show(
-                            "I didn’t catch that. Try a short command.",
+                            "I heard you, but that action is not available here. "
+                            "Try one of the on-screen commands.",
                             COLORS["yellow"],
                         )
                 elif command.action == "cancel":
@@ -46,7 +48,9 @@ class BaseScene(Scene):
                 else:
                     self.handle_command(command)
             elif message.kind == "unrecognized":
-                self.toast.show("Say that again", COLORS["yellow"])
+                self.toast.show(message.text, COLORS["yellow"])
+            elif message.kind == "notice":
+                self.toast.show(message.text, COLORS["yellow"])
             else:
                 self.toast.show(message.text, COLORS["red"])
 
@@ -99,21 +103,36 @@ class BaseScene(Scene):
             color=COLORS["cyan"],
             role="heading",
         )
+        title_font = font(34, "heading")
+        title_size = 34
+        title_width = width - 600
+        while title_size > 23 and title_font.size(title)[0] > title_width:
+            title_size -= 1
+            title_font = font(title_size, "heading")
         draw_text(
             surface,
-            title,
+            fit_text(title, title_font, title_width),
             (52, 57),
-            size=34,
+            size=title_size,
             color=COLORS["text"],
             role="heading",
         )
-        draw_text(
-            surface,
-            subtitle,
-            (54, 105),
-            size=16,
-            color=COLORS["text_muted"],
-        )
+        subtitle_width = width - 560
+        subtitle_lines = wrap_text(subtitle, font(16), subtitle_width)[:2]
+        if subtitle_lines:
+            subtitle_lines[-1] = fit_text(
+                subtitle_lines[-1] + ("..." if len(wrap_text(subtitle, font(16), subtitle_width)) > 2 else ""),
+                font(16),
+                subtitle_width,
+            )
+        for line_index, line in enumerate(subtitle_lines):
+            draw_text(
+                surface,
+                line,
+                (54, 104 + line_index * 19),
+                size=16,
+                color=COLORS["text_muted"],
+            )
         self.mic_indicator.status = self.game.mic_status.state
         self.mic_indicator.draw(surface, pygame.Rect(width - 230, 32, 178, 42))
 
@@ -175,11 +194,11 @@ class BaseScene(Scene):
             align="midleft",
         )
         if self.toast.visible:
-            toast_width = min(460, width - 64)
+            toast_width = min(420, width - 64)
             toast_rect = pygame.Rect(
-                (width - toast_width) // 2,
-                height - 112,
+                width - toast_width - 32,
+                82,
                 toast_width,
-                42,
+                52,
             )
             self.toast.draw(surface, toast_rect)

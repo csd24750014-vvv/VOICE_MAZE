@@ -26,7 +26,7 @@ class MazeValidatorTests(unittest.TestCase):
                 self.assertTrue(all(position in result.route for position in layout.doors.values()))
 
     def test_maze_size_grows_with_each_difficulty(self) -> None:
-        """A higher level has a larger labyrinth and more decision junctions."""
+        """Maze size and route complexity increase at every level for each domain."""
         for domain in ("Python", "SQL", "Logical Reasoning"):
             layouts = [
                 layout
@@ -36,8 +36,11 @@ class MazeValidatorTests(unittest.TestCase):
             layouts.sort(key=lambda layout: ("Beginner", "Intermediate", "Advanced").index(layout.level))
             self.assertEqual(
                 [layout.width for layout in layouts],
-                [19, 23, 27],
+                [11, 15, 19],
             )
+            route_lengths = [len(layout.intended_route) for layout in layouts]
+            self.assertLess(route_lengths[0], route_lengths[1])
+            self.assertLess(route_lengths[1], route_lengths[2])
             junction_counts = [
                 sum(
                     sum(
@@ -52,6 +55,33 @@ class MazeValidatorTests(unittest.TestCase):
             ]
             self.assertLess(junction_counts[0], junction_counts[1])
             self.assertLess(junction_counts[1], junction_counts[2])
+            turn_counts = [
+                sum(
+                    (
+                        layout.intended_route[index][0]
+                        - layout.intended_route[index - 1][0],
+                        layout.intended_route[index][1]
+                        - layout.intended_route[index - 1][1],
+                    )
+                    != (
+                        layout.intended_route[index + 1][0]
+                        - layout.intended_route[index][0],
+                        layout.intended_route[index + 1][1]
+                        - layout.intended_route[index][1],
+                    )
+                    for index in range(1, len(layout.intended_route) - 1)
+                )
+                for layout in layouts
+            ]
+            self.assertLess(turn_counts[0], turn_counts[1])
+            self.assertLess(turn_counts[1], turn_counts[2])
+
+    def test_all_nine_course_grids_are_distinct(self) -> None:
+        """Each domain and difficulty receives its own recognizable layout."""
+        layouts = tuple(all_mazes())
+
+        self.assertEqual(len(layouts), 9)
+        self.assertEqual(len({layout.grid for layout in layouts}), 9)
 
     def test_validator_rejects_a_grid_with_a_missing_door(self) -> None:
         """A missing door tile is reported as an invalid maze."""

@@ -27,6 +27,13 @@
           "accuracy": 84.62,
           "elapsed_seconds": 293.25,
           "completed": false
+        },
+        {
+          "recorded_at": "2026-11-12T14:08:46.041458+00:00",
+          "score": 1450,
+          "accuracy": 86.67,
+          "elapsed_seconds": 88.84,
+          "completed": false
         }
       ]
     },

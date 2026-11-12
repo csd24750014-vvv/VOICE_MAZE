@@ -13,20 +13,20 @@ START = "S"
 FINISH = "F"
 
 _CELL_COUNTS = {
-    "beginner": 9,
-    "intermediate": 11,
-    "advanced": 13,
+    "beginner": 5,
+    "intermediate": 7,
+    "advanced": 9,
 }
 _COURSE_SEEDS: Dict[Tuple[str, str], int] = {
-    ("python", "beginner"): 1103,
-    ("python", "intermediate"): 1207,
-    ("python", "advanced"): 1301,
-    ("sql", "beginner"): 2101,
-    ("sql", "intermediate"): 2203,
-    ("sql", "advanced"): 2309,
-    ("logical reasoning", "beginner"): 3109,
-    ("logical reasoning", "intermediate"): 3203,
-    ("logical reasoning", "advanced"): 3301,
+    ("python", "beginner"): 1000,
+    ("python", "intermediate"): 1003,
+    ("python", "advanced"): 1005,
+    ("sql", "beginner"): 2000,
+    ("sql", "intermediate"): 2001,
+    ("sql", "advanced"): 2003,
+    ("logical reasoning", "beginner"): 3000,
+    ("logical reasoning", "intermediate"): 3001,
+    ("logical reasoning", "advanced"): 3002,
 }
 _DOMAIN_LABELS = {
     "python": "Python",

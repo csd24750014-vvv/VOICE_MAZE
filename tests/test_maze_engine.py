@@ -54,6 +54,30 @@ class CorridorMovementTests(unittest.TestCase):
                 self.assertEqual(result.position, predecessor)
                 self.assertNotEqual(result.position, door_position)
 
+    def test_unlocking_adjacent_door_removes_gate_and_moves_player_onto_it(self) -> None:
+        """Passing a door quiz opens the gate beneath the player."""
+        for layout in all_mazes():
+            with self.subTest(domain=layout.domain, level=layout.level):
+                engine = MazeEngine(layout)
+                door_id = min(layout.doors)
+                door_position = layout.doors[door_id]
+                route_index = layout.intended_route.index(door_position)
+                predecessor = layout.intended_route[route_index - 1]
+                engine.player_position = predecessor
+
+                engine.unlock_door(door_id)
+
+                self.assertEqual(engine.player_position, door_position)
+                self.assertIn(door_id, engine.unlocked_doors)
+                self.assertEqual(engine.move(
+                    _DIRECTION_BY_DELTA[
+                        (
+                            layout.intended_route[route_index + 1][0] - door_position[0],
+                            layout.intended_route[route_index + 1][1] - door_position[1],
+                        )
+                    ]
+                ).position, layout.intended_route[route_index + 1])
+
     def test_move_stops_at_wall_without_leaving_the_maze(self) -> None:
         """A move into a wall leaves the player at the edge of its branch."""
         for layout in all_mazes():

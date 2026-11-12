@@ -9,7 +9,8 @@ import pygame
 from scenes.base_scene import BaseScene
 from scenes.level_scene import LevelScene
 from scenes.notes_scene import NotesScene
-from ui.components import Button
+from ui.components import Button, Toast
+from ui.theme import draw_text, font, wrap_text
 
 
 class LearningScreenLayoutTests(unittest.TestCase):
@@ -101,6 +102,77 @@ class LearningScreenLayoutTests(unittest.TestCase):
         self.assertFalse(footer_panels[0].colliderect(toast_rect))
         self.assertFalse(footer_panels[1].colliderect(toast_rect))
         self.assertTrue(scene.toast.visible)
+
+    def test_long_button_labels_and_toasts_stay_within_their_bounds(self) -> None:
+        """Wrapped voice and option text remains inside its own UI component."""
+        self.assertTrue(
+            all(
+                font(14).size(line)[0] <= 180
+                for line in wrap_text(
+                    "A very long quiz answer that needs a clean wrap",
+                    font(14),
+                    180,
+                )
+            )
+        )
+        text_bounds: list[pygame.Rect] = []
+        original_draw_text = draw_text
+
+        def capture_text(*args: object, **kwargs: object) -> pygame.Rect:
+            bounds = original_draw_text(*args, **kwargs)
+            text_bounds.append(bounds)
+            return bounds
+
+        button_rect = pygame.Rect(200, 200, 360, 48)
+        button = Button(
+            button_rect,
+            "A very long quiz answer that must never overflow the button",
+        )
+        toast_rect = pygame.Rect(800, 82, 420, 52)
+        toast = Toast()
+        toast.show(
+            "I heard you, but that action is not available here. "
+            "Try one of the on-screen commands."
+        )
+        with patch("ui.components.draw_text", side_effect=capture_text):
+            button.draw(self.surface)
+            button_text_bounds = text_bounds[:]
+            text_bounds.clear()
+            toast.draw(self.surface, toast_rect)
+
+        self.assertTrue(button_text_bounds)
+        self.assertTrue(all(button_rect.contains(bounds) for bounds in button_text_bounds))
+        self.assertTrue(text_bounds)
+        self.assertTrue(all(toast_rect.contains(bounds) for bounds in text_bounds))
+
+    def test_toast_avoids_the_heading_area_at_minimum_window_size(self) -> None:
+        """A long screen title remains separate from the top-right voice toast."""
+        scene = BaseScene(self.game)
+        scene.toast.show("A long voice status message that wraps onto two lines.")
+        draw_bounds: list[pygame.Rect] = []
+        original_draw_text = draw_text
+
+        def capture_text(*args: object, **kwargs: object) -> pygame.Rect:
+            bounds = original_draw_text(*args, **kwargs)
+            draw_bounds.append(bounds)
+            return bounds
+
+        with (
+            patch("scenes.base_scene.draw_text", side_effect=capture_text),
+            patch.object(scene.toast, "draw", wraps=scene.toast.draw) as toast_draw,
+        ):
+            scene.draw_shell(
+                self.surface,
+                "RESULTS",
+                "A particularly long title that should not touch the voice indicator",
+                "A longer subtitle that should wrap without crossing over the toast.",
+                draw_background=False,
+            )
+
+        toast_rect = toast_draw.call_args.args[1]
+        title_bounds = draw_bounds[1]
+        self.assertFalse(title_bounds.colliderect(toast_rect))
+        self.assertGreaterEqual(toast_rect.top, 82)
 
 
 if __name__ == "__main__":

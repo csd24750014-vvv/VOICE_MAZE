@@ -4,7 +4,17 @@ from dataclasses import dataclass
 from threading import Lock
 from typing import Literal
 
-MicStateName = Literal["idle", "listening", "processing", "error"]
+MicStateName = Literal[
+    "idle",
+    "listening",
+    "processing",
+    "listening_offline",
+    "processing_offline",
+    "listening_online",
+    "processing_online",
+    "online_unavailable",
+    "error",
+]
 
 
 @dataclass(frozen=True)

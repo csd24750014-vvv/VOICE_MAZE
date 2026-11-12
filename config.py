@@ -7,6 +7,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 DATA_DIR = PROJECT_ROOT / "data"
 SCORES_FILE = DATA_DIR / "scores.json"
 ASSETS_DIR = PROJECT_ROOT / "assets"
+VOICE_MODEL_DIR = ASSETS_DIR / "models" / "vosk-model-small-en-us-0.15"
 
 # The game starts large enough to show its learning and maze panels comfortably.
 SCREEN_WIDTH = 1440
@@ -56,8 +57,13 @@ TIMINGS = {
 # Speech is captured in short windows so the microphone worker can stop promptly.
 VOICE = {
     "language": "en-US",
+    "offline_model_dir": VOICE_MODEL_DIR,
     "listen_timeout_seconds": 0.8,
     "phrase_limit_seconds": 4,
+    "online_operation_timeout_seconds": 2.5,
+    "online_retry_initial_seconds": 20.0,
+    "online_retry_max_seconds": 60.0,
+    "unrecognized_feedback_cooldown_seconds": 5.0,
     "ambient_calibration_seconds": 0.4,
     "dynamic_energy_ratio": 1.25,
     "dynamic_energy_adjustment_damping": 0.1,

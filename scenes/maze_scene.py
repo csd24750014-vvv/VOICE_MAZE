@@ -168,7 +168,7 @@ class MazeScene(BaseScene):
                 else:
                     floor_color = (19, 25, 43) if (x + y) % 2 == 0 else (22, 29, 49)
                     pygame.draw.rect(surface, floor_color, rect, border_radius=4)
-                    if tile in "12345":
+                    if tile in "12345" and int(tile) not in self.engine.unlocked_doors:
                         self._draw_door(surface, glow_surface, rect, int(tile), cell_size)
                     elif tile == START:
                         pygame.draw.circle(

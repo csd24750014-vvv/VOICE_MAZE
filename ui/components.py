@@ -7,7 +7,7 @@ from typing import Iterable, Optional, Sequence
 import pygame
 
 import config
-from ui.theme import COLORS, draw_rounded_rect, draw_text, font
+from ui.theme import COLORS, draw_rounded_rect, draw_text, fit_text, font, wrap_text
 
 
 class Button:
@@ -64,15 +64,35 @@ class Button:
             border_color=self.accent if self.hovered and self.enabled else COLORS["border"],
         )
         label_color = COLORS["text"] if self.enabled else COLORS["text_muted"]
-        draw_text(
-            surface,
-            self.label,
-            self.rect.center,
-            size=19,
-            color=label_color,
-            role="heading",
-            align="center",
-        )
+        label_size = 19
+        label_font = font(label_size, "heading")
+        lines = wrap_text(self.label, label_font, max(1, self.rect.width - 32))
+        while (
+            len(lines) * (label_size + 3) > self.rect.height - 10
+            and label_size > 12
+        ):
+            label_size -= 1
+            label_font = font(label_size, "heading")
+            lines = wrap_text(self.label, label_font, max(1, self.rect.width - 32))
+        max_lines = max(1, (self.rect.height - 10) // (label_size + 3))
+        if len(lines) > max_lines:
+            lines = lines[:max_lines]
+            lines[-1] = fit_text(
+                lines[-1] + "...",
+                label_font,
+                max(1, self.rect.width - 32),
+            )
+        start_y = self.rect.centery - len(lines) * (label_size + 3) // 2
+        for index, line in enumerate(lines):
+            draw_text(
+                surface,
+                line,
+                (self.rect.centerx, start_y + index * (label_size + 3)),
+                size=label_size,
+                color=label_color,
+                role="heading",
+                align="midtop",
+            )
 
 
 class Card:
@@ -110,13 +130,44 @@ class Card:
         )
         x = self.rect.x + padding
         y = self.rect.y + padding
+        max_width = max(24, self.rect.width - 2 * padding)
+        available_bottom = self.rect.bottom - padding
         if self.title:
-            draw_text(surface, self.title, (x, y), size=22, role="heading")
-            y += 38
-        for line in self.body:
-            for wrapped in _wrap_text(line, max(24, self.rect.width - 2 * padding)):
-                draw_text(surface, wrapped, (x, y), size=16, color=COLORS["text_muted"])
-                y += 25
+            title_size = 22
+            title_font = font(title_size, "heading")
+            while title_size > 15 and title_font.size(self.title)[0] > max_width:
+                title_size -= 1
+                title_font = font(title_size, "heading")
+            draw_text(
+                surface,
+                fit_text(self.title, title_font, max_width),
+                (x, y),
+                size=title_size,
+                role="heading",
+            )
+            y += title_size + 16
+        body_font = font(16)
+        body_lines = [
+            wrapped
+            for line in self.body
+            for wrapped in wrap_text(line, body_font, max_width)
+        ]
+        line_height = 22
+        max_body_lines = max(0, (available_bottom - y) // line_height)
+        if len(body_lines) > max_body_lines:
+            body_lines = body_lines[:max_body_lines]
+            if body_lines:
+                body_lines[-1] = fit_text(
+                    body_lines[-1] + "...",
+                    body_font,
+                    max_width,
+                )
+        previous_clip = surface.get_clip()
+        surface.set_clip(self.rect.inflate(-8, -8))
+        for line in body_lines:
+            draw_text(surface, line, (x, y), size=16, color=COLORS["text_muted"])
+            y += line_height
+        surface.set_clip(previous_clip)
 
 
 class ProgressBar:
@@ -162,6 +213,11 @@ class MicIndicator:
     STATUS_LABELS = {
         "listening": "Listening",
         "processing": "Processing",
+        "listening_offline": "Offline voice",
+        "processing_offline": "Offline process",
+        "listening_online": "Online voice",
+        "processing_online": "Online process",
+        "online_unavailable": "Internet unavailable",
         "error": "Mic unavailable",
         "idle": "Voice ready",
     }
@@ -179,19 +235,20 @@ class MicIndicator:
         """Draw a status badge and pulse its dot while voice is listening."""
         current_time = time.monotonic() if now is None else now
         label = self.STATUS_LABELS.get(self.status, self.STATUS_LABELS["idle"])
-        color_name = "red" if self.status == "error" else (
-            "green" if self.status == "listening" else "cyan"
+        is_listening = self.status.startswith("listening")
+        color_name = "red" if self.status in {"error", "online_unavailable"} else (
+            "green" if is_listening else "cyan"
         )
         color = COLORS[color_name]
         draw_rounded_rect(surface, rect, COLORS["surface"], radius=14, border_color=COLORS["border"])
         center = (rect.x + 19, rect.centery)
-        if self.status == "listening":
+        if is_listening:
             pulse = 3 + int((math.sin(current_time * 5.5) + 1) * 2)
             pygame.draw.circle(surface, (*color, 65), center, pulse + 5)
         pygame.draw.circle(surface, color, center, 5)
         draw_text(
             surface,
-            label,
+            fit_text(label, font(14), rect.width - 44),
             (rect.x + 32, rect.centery),
             size=14,
             color=COLORS["text"],
@@ -237,14 +294,30 @@ class Toast:
         )
         surface.blit(panel, rect.topleft)
         draw_rounded_rect(surface, rect, COLORS["surface"], 14, self.accent, 2)
-        draw_text(
-            surface,
-            self.message,
-            rect.center,
-            size=16,
-            color=COLORS["text"],
-            align="center",
-        )
+        text_size = 15
+        text_font = font(text_size)
+        lines = wrap_text(self.message, text_font, rect.width - 30)
+        while len(lines) > 2 and text_size > 11:
+            text_size -= 1
+            text_font = font(text_size)
+            lines = wrap_text(self.message, text_font, rect.width - 30)
+        max_lines = max(1, (rect.height - 12) // (text_size + 3))
+        if len(lines) > max_lines:
+            lines = lines[:max_lines]
+            lines[-1] = fit_text(lines[-1] + "...", text_font, rect.width - 30)
+        start_y = rect.centery - len(lines) * (text_size + 3) // 2
+        previous_clip = surface.get_clip()
+        surface.set_clip(rect.inflate(-8, -6))
+        for index, line in enumerate(lines):
+            draw_text(
+                surface,
+                line,
+                (rect.centerx, start_y + index * (text_size + 3)),
+                size=text_size,
+                color=COLORS["text"],
+                align="midtop",
+            )
+        surface.set_clip(previous_clip)
 
 
 class Modal:
@@ -291,14 +364,45 @@ class Modal:
             border_color=COLORS["border"],
             border_width=2,
         )
-        draw_text(surface, self.title, (dialog.centerx, dialog.y + 32), 26, role="heading", align="midtop")
-        y = dialog.y + 83
-        for line in self.body:
-            draw_text(surface, line, (dialog.x + 28, y), 16, COLORS["text_muted"])
-            y += 27
         button_rect = pygame.Rect(dialog.centerx - 90, dialog.bottom - 72, 180, 44)
         if self._button is None or self._button.rect != button_rect:
             self._button = Button(button_rect, self.button_label)
+        title_font = font(26, "heading")
+        draw_text(
+            surface,
+            fit_text(self.title, title_font, dialog.width - 56),
+            (dialog.centerx, dialog.y + 32),
+            26,
+            role="heading",
+            align="midtop",
+        )
+        body_font = font(16)
+        body_width = dialog.width - 56
+        body_lines = [
+            wrapped
+            for line in self.body
+            for wrapped in wrap_text(line, body_font, body_width)
+        ]
+        line_height = 21
+        body_y = dialog.y + 83
+        max_lines = max(0, (button_rect.top - body_y - 10) // line_height)
+        if len(body_lines) > max_lines:
+            body_lines = body_lines[:max_lines]
+            if body_lines:
+                body_lines[-1] = fit_text(
+                    body_lines[-1] + "...",
+                    body_font,
+                    body_width,
+                )
+        previous_clip = surface.get_clip()
+        surface.set_clip(
+            pygame.Rect(dialog.x + 20, body_y, dialog.width - 40, max(0, button_rect.top - body_y - 8))
+        )
+        y = body_y
+        for line in body_lines:
+            draw_text(surface, line, (dialog.x + 28, y), 16, COLORS["text_muted"])
+            y += line_height
+        surface.set_clip(previous_clip)
         self._button.draw(surface)
 
     @staticmethod
@@ -311,20 +415,3 @@ class Modal:
             bounds.centery - height // 2,
         )
 
-
-def _wrap_text(text: str, max_width: int) -> list[str]:
-    """Wrap a string into lines that fit within the requested pixel width."""
-    words = text.split()
-    if not words:
-        return [""]
-    lines: list[str] = []
-    current = words[0]
-    for word in words[1:]:
-        candidate = f"{current} {word}"
-        if font(16).size(candidate)[0] <= max_width:
-            current = candidate
-        else:
-            lines.append(current)
-            current = word
-    lines.append(current)
-    return lines
